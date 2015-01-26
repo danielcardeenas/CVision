@@ -20,8 +20,8 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    //img = imread(argv[1], CV_LOAD_IMAGE_COLOR);
-    img = imread(argv[1], CV_LOAD_IMAGE_GRAYSCALE);
+    img = imread(argv[1], CV_LOAD_IMAGE_COLOR);
+    //img = imread(argv[1], CV_LOAD_IMAGE_GRAYSCALE);
     //out_img = img.clone();
     //for(int y = 0; y < img.rows; y++)
     //for(int x = 0; x < img.cols; x++)
@@ -48,7 +48,7 @@ int main(int argc, char** argv)
 
     imshow("Original", img);
     imshow("Median", out_img);
-    //imwrite("entei.jpg", out_img);
+    imwrite("medianFiltered.jpg", out_img);
 
     while(waitKey(1) != 27);
     return 0;
