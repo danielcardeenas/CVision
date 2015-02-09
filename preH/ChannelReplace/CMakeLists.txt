@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+project(ChannelReplace)
+find_package(OpenCV REQUIRED)
+add_executable(ChannelReplace main.cpp )
+target_link_libraries(ChannelReplace ${OpenCV_LIBS})
