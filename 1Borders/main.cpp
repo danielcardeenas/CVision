@@ -1,3 +1,10 @@
+/* ---------------------------------------------------------------------------
+** References: 
+**  Convolution: http://docs.opencv.org/doc/tutorials/imgproc/imgtrans/filter_2d/filter_2d.html
+**  Sobel function: http://docs.opencv.org/modules/imgproc/doc/filtering.html?highlight=sobel#sobel
+**  Thresholding: http://docs.opencv.org/doc/tutorials/imgproc/threshold/threshold.html
+** -------------------------------------------------------------------------*/
+
 #include <stdlib.h>
 #include <stdio.h>
 
