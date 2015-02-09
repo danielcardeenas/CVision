@@ -1,4 +1,5 @@
-# Usage
+# Borders detection
+Detects the borders of a given image and colors them in a striking way.
 
 ### Compiling
 
