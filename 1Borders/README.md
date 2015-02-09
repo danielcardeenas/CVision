@@ -17,6 +17,6 @@ $ ./Borders <img_to_use.jpg>
 ```
 
 ### Info
-The image used for the **input**: ```img/lis.jpg```
+The image used for the **input**: ```img/lis.png```
 
 **Outputs**: ```bordered.jpg```and ```threshold.jpg```
