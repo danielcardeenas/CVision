@@ -163,4 +163,3 @@ void XYNeighbors(Coordinate coo, cv::Mat& img, std::vector<std::vector<cv::Vec3b
         
     return;
 }
-

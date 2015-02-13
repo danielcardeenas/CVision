@@ -13,6 +13,8 @@ set(LIB_FILES
     ../../libs/Filters.h 
     ../../libs/Utils.cpp 
     ../../libs/Utils.h
+    ../../libs/Neighborhood.cpp 
+    ../../libs/Neighborhood.h
     )
     
 add_executable(MedianFilter ${SOURCE_FILES} ${LIB_FILES})

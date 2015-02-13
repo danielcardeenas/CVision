@@ -3,6 +3,7 @@
 
 #include "Utils.h"
 #include "Filters.h"
+#include "Neighborhood.h"
 
 std::vector<cv::Vec3b> field;
 std::vector<int> pix(9);
@@ -125,6 +126,98 @@ void MedianFilter(cv::Mat& img, cv::Mat& out_img)
         }
 }
 
+void FastMedian(cv::Mat& img, cv::Mat& out_img)
+{
+    uchar r, g, b;
+    int x = 0;
+    Neighborhood directNeigh;
+    
+    for (int i = 0; i < img.rows; ++i)
+    {
+        cv::Vec3b* pixel_r1 = img.ptr<cv::Vec3b>(i); // point to first pixel in row
+        cv::Vec3b* pixel_r2 = img.ptr<cv::Vec3b>(i+1); // point to first pixel in row
+        cv::Vec3b* pixel_r3 = img.ptr<cv::Vec3b>(i+2); // point to first pixel in row
+        for (int j = 0; j < img.cols; ++j)
+        {
+            // (0,0)
+            r = pixel_r1[j][2];
+            g = pixel_r1[j][1];
+            b = pixel_r1[j][0];
+            directNeigh.push(r, g, b, x);
+            x++;
+            
+            // (0,1)
+            r = pixel_r1[j+1][2];
+            g = pixel_r1[j+1][1];
+            b = pixel_r1[j+1][0];
+            directNeigh.push(r, g, b, x);
+            x++;
+            
+            // (0,2)
+            r = pixel_r1[j+1][2];
+            g = pixel_r1[j+1][1];
+            b = pixel_r1[j+1][0];
+            directNeigh.push(r, g, b, x);
+            x++;
+            
+            // (1,0)
+            r = pixel_r2[j][2];
+            g = pixel_r2[j][1];
+            b = pixel_r2[j][0];
+            directNeigh.push(r, g, b, x);
+            x++;
+            
+            // (1,1)
+            r = pixel_r2[j+1][2];
+            g = pixel_r2[j+1][1];
+            b = pixel_r2[j+1][0];
+            directNeigh.push(r, g, b, x);
+            x++;
+            
+            // (1,2)
+            r = pixel_r2[j+1][2];
+            g = pixel_r2[j+1][1];
+            b = pixel_r2[j+1][0];
+            directNeigh.push(r, g, b, x);
+            x++;
+            
+            // (2,0)
+            r = pixel_r3[j][2];
+            g = pixel_r3[j][1];
+            b = pixel_r3[j][0];
+            directNeigh.push(r, g, b, x);
+            x++;
+            
+            // (2,1)
+            r = pixel_r3[j+1][2];
+            g = pixel_r3[j+1][1];
+            b = pixel_r3[j+1][0];
+            directNeigh.push(r, g, b, x);
+            x++;
+            
+            // (2,2)
+            r = pixel_r3[j+1][2];
+            g = pixel_r3[j+1][1];
+            b = pixel_r3[j+1][0];
+            directNeigh.push(r, g, b, x);
+            x = 0;
+            
+            // Get median from the neighborhood
+            for(i = 0; i < 9; i++)
+                pix.at(i) = directNeigh.sum(i);
+            
+            // Find the median value in the vector and set it to an iterator
+            it = find(pix.begin(), pix.end(), Median(pix));
+            auto index = std::distance(pix.begin(), it);
+            out_img.at<cv::Vec3b>(i, j) = field.at(index);
+            
+            pix.clear();
+            field.clear();
+            
+        }
+    }
+}
+
 /**
  * Easy-way calling for the actual convolution algorithm
  * Giving a 2D int array, applies convolution to img
@@ -135,6 +228,8 @@ void MedianFilter(cv::Mat& img, cv::Mat& out_img)
  *  [OUTPUT] <vector<Vec3b> neighborhood = Where the pixel's neighbors are set. Must be initialized in the desired size
  *  Coordinate anchor of the kernel
 */
+
+/**
 void Convolution(cv::Mat& img, cv::Mat& out_img, std::vector<std::vector<cv::Vec3b>>& neighborhood, std::vector<std::vector<int>> kernel, Coordinate anchor)
 {
     assert(kernel.size() < anchor.x || kernel[0].size() < anchor.y);
@@ -158,3 +253,4 @@ void ComputeConvolution(cv::Mat& img, cv::Mat& out_img, std::vector<std::vector<
     
     return;
 }
+*/
