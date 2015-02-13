@@ -3,7 +3,6 @@
 
 #include "opencv2/opencv.hpp"
 
-int Median(std::vector<int> vec); // Median value of a vector
 void MedianFilter(cv::Mat& img, cv::Mat& out_img); // Easy-way calling method
 void ComputeMedian(int& x, int& y, cv::Mat& img, cv::Mat& out_img); // Actual filter algorithm
 void FastMedian(cv::Mat& img, cv::Mat& out_img);

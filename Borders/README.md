@@ -7,7 +7,7 @@ Clone this repository and build the tool using [CMake](http://www.cmake.org/down
 
 ```sh
 $ git clone https://github.com/danielcardeenas/CVision.git
-$ cd 1Borders
+$ cd CVision/Borders/
 $ cmake .
 $ make
 ```

@@ -5,9 +5,31 @@
 std::vector<cv::Vec3b> neighbors;
 
 /**
+ * Median value of a std::vector<int>
+ * @note: Gets the vector as copy, so the sorting does not affcet the original vector
+ * @param std::vector<int>
+ * @return int median
+*/
+int Median(std::vector<int> vec)
+{
+    int median;
+    size_t size = vec.size();
+
+    // Sort
+    sort(vec.begin(), vec.end());
+
+    if (size  % 2 == 0)
+        median = (vec[size / 2 - 1] + vec[size / 2]) / 2;
+    else
+        median = vec[size / 2];
+
+    //vector<int>().swap(vec);
+    return median;
+}
+
+/**
  * Gets all the direct neighbors of a pixel and sets them into
  * std::vector<Vec3b> field -> Global variable
- * [3][3] -> [9]
 */
 void DirectNeighbors(int x, int y, cv::Mat& img, std::vector<cv::Vec3b>& field)
 {

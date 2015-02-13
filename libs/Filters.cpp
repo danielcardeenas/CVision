@@ -22,29 +22,6 @@ int medRed;
 int _x, _y;
 
 /**
- * Median value of a std::vector<int>
- * @note: Gets the vector as copy, so the sorting does not affcet the original vector
- * @param std::vector<int>
- * @return int median
-*/
-int Median(std::vector<int> vec)
-{
-    int median;
-    size_t size = vec.size();
-
-    // Sort
-    sort(vec.begin(), vec.end());
-
-    if (size  % 2 == 0)
-        median = (vec[size / 2 - 1] + vec[size / 2]) / 2;
-    else
-        median = vec[size / 2];
-
-    //vector<int>().swap(vec);
-    return median;
-}
-
-/**
  * Computes the median of a pixel coordinate (x, y) from Mat::img 
  * and sets it to Mat::out_img on the same coordinate
  * @param: int x, int y, Mat::img, Mat::out_img
@@ -131,13 +108,17 @@ void FastMedian(cv::Mat& img, cv::Mat& out_img)
     uchar r, g, b;
     int x = 0;
     Neighborhood directNeigh;
+
+    cv::Vec3b* pixel_r1 = img.ptr<cv::Vec3b>(i-1); // point to first pixel in row
+    cv::Vec3b* pixel_r2 = img.ptr<cv::Vec3b>(i); // point to first pixel in row
+    cv::Vec3b* pixel_r3 = img.ptr<cv::Vec3b>(i+1); // point to first pixel in row
     
-    for (int i = 0; i < img.rows; ++i)
+    for (int i = 1; i < img.rows -1; ++i)
     {
-        cv::Vec3b* pixel_r1 = img.ptr<cv::Vec3b>(i); // point to first pixel in row
-        cv::Vec3b* pixel_r2 = img.ptr<cv::Vec3b>(i+1); // point to first pixel in row
-        cv::Vec3b* pixel_r3 = img.ptr<cv::Vec3b>(i+2); // point to first pixel in row
-        for (int j = 0; j < img.cols; ++j)
+        pixel_r1 = img.ptr<cv::Vec3b>(i); // point to first pixel in row
+        pixel_r2 = img.ptr<cv::Vec3b>(i+1); // point to first pixel in row
+        pixel_r3 = img.ptr<cv::Vec3b>(i+2); // point to first pixel in row
+        for (int j = 1; j < img.cols -1; ++j)
         {
             // (0,0)
             r = pixel_r1[j][2];
@@ -203,13 +184,14 @@ void FastMedian(cv::Mat& img, cv::Mat& out_img)
             x = 0;
             
             // Get median from the neighborhood
-            for(i = 0; i < 9; i++)
-                pix.at(i) = directNeigh.sum(i);
+            pix.resize(9);
+            for(int z = 0; z < 9; z++)
+                pix.at(z) = directNeigh.sum(z);
             
             // Find the median value in the vector and set it to an iterator
             it = find(pix.begin(), pix.end(), Median(pix));
             auto index = std::distance(pix.begin(), it);
-            out_img.at<cv::Vec3b>(i, j) = field.at(index);
+            out_img.at<cv::Vec3b>(i, j) = directNeigh.pixel(index);
             
             pix.clear();
             field.clear();

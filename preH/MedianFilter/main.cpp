@@ -38,7 +38,22 @@ int main(int argc, char** argv)
     begin = std::chrono::steady_clock::now();
     
     // Where magic happens
-    MedianFilter(img, out_img);
+    FastMedian(img, out_img);
+    
+    // Stop counting and print time elapsed
+    end= std::chrono::steady_clock::now();
+    std::cout << "Time elapsed fast: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " Miliseconds" <<std::endl;
+    
+    // Write image in same directory
+    std::cout << "Writing image... (" << "fast.jpg" << ")" << std::endl;
+    
+    imwrite("fast.jpg", out_img);
+    
+    // Start counting time
+    begin = std::chrono::steady_clock::now();
+    
+    // Where magic happens
+    MedianFilter(img, dst);
     
     // Stop counting and print time elapsed
     end= std::chrono::steady_clock::now();
@@ -47,21 +62,7 @@ int main(int argc, char** argv)
     // Write image in same directory
     std::cout << "Writing image... (" << outputPath << ")" << std::endl;
     
-    imwrite(outputPath, out_img);
-    
-    begin = std::chrono::steady_clock::now();
-    // Where magic happens
-    FastMedian(img, out_img);
-    
-    // Stop counting and print time elapsed
-    end= std::chrono::steady_clock::now();
-    std::cout << "Time elapsed Fast method: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " Miliseconds" <<std::endl;
-    
-    // Write image in same directory
-    std::cout << "Writing image... (" << outputPath << ")" << std::endl;
-    
-    imwrite("fast.jpg", fast);
-    
+    imwrite(outputPath, dst);
     
     img.release();
     out_img.release();
