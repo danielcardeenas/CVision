@@ -87,7 +87,9 @@ void ComputeMedian(int& x, int& y, cv::Mat& img, cv::Mat& out_img)
  * Easy-way calling for the actual filter algorithm
  * Sets median filter to Mat::img. Outputs Mat::out_img
  * @note: Gets the images as reference
- * @param Mat::img input image, Mat::out_img output image
+ * @param 
+ *  [INPUT]  Mat: input image
+ *  [OUTPUT] Mat: image to output (Cannot be the same as input)
 */
 void MedianFilter(cv::Mat& img, cv::Mat& out_img)
 {
@@ -103,34 +105,42 @@ void MedianFilter(cv::Mat& img, cv::Mat& out_img)
         }
 }
 
+/**
+ * Two times faster than my normal median filter
+ * Still not as fast the opencv implementation.
+ * Only works with a 3x3 neighborhood
+ * @param 
+ *  [INPUT]  Mat: input image
+ *  [OUTPUT] Mat: image to output (Cannot be the same as input)
+*/
 void FastMedian(cv::Mat& img, cv::Mat& out_img)
 {
     uchar r, g, b;
     int x = 0;
     Neighborhood directNeigh;
 
-    cv::Vec3b* pixel_r1 = img.ptr<cv::Vec3b>(i-1); // point to first pixel in row
-    cv::Vec3b* pixel_r2 = img.ptr<cv::Vec3b>(i); // point to first pixel in row
-    cv::Vec3b* pixel_r3 = img.ptr<cv::Vec3b>(i+1); // point to first pixel in row
+    cv::Vec3b* pixel_r1;
+    cv::Vec3b* pixel_r2;
+    cv::Vec3b* pixel_r3;
     
     for (int i = 1; i < img.rows -1; ++i)
     {
-        pixel_r1 = img.ptr<cv::Vec3b>(i); // point to first pixel in row
-        pixel_r2 = img.ptr<cv::Vec3b>(i+1); // point to first pixel in row
-        pixel_r3 = img.ptr<cv::Vec3b>(i+2); // point to first pixel in row
+        pixel_r1 = img.ptr<cv::Vec3b>(i-1); // point to first pixel in row
+        pixel_r2 = img.ptr<cv::Vec3b>(i); // point to first pixel in row
+        pixel_r3 = img.ptr<cv::Vec3b>(i+1); // point to first pixel in row
         for (int j = 1; j < img.cols -1; ++j)
         {
             // (0,0)
-            r = pixel_r1[j][2];
-            g = pixel_r1[j][1];
-            b = pixel_r1[j][0];
+            r = pixel_r1[j-1][2];
+            g = pixel_r1[j-1][1];
+            b = pixel_r1[j-1][0];
             directNeigh.push(r, g, b, x);
             x++;
             
             // (0,1)
-            r = pixel_r1[j+1][2];
-            g = pixel_r1[j+1][1];
-            b = pixel_r1[j+1][0];
+            r = pixel_r1[j][2];
+            g = pixel_r1[j][1];
+            b = pixel_r1[j][0];
             directNeigh.push(r, g, b, x);
             x++;
             
@@ -142,16 +152,16 @@ void FastMedian(cv::Mat& img, cv::Mat& out_img)
             x++;
             
             // (1,0)
-            r = pixel_r2[j][2];
-            g = pixel_r2[j][1];
-            b = pixel_r2[j][0];
+            r = pixel_r2[j-1][2];
+            g = pixel_r2[j-1][1];
+            b = pixel_r2[j-1][0];
             directNeigh.push(r, g, b, x);
             x++;
             
             // (1,1)
-            r = pixel_r2[j+1][2];
-            g = pixel_r2[j+1][1];
-            b = pixel_r2[j+1][0];
+            r = pixel_r2[j][2];
+            g = pixel_r2[j][1];
+            b = pixel_r2[j][0];
             directNeigh.push(r, g, b, x);
             x++;
             
@@ -163,16 +173,16 @@ void FastMedian(cv::Mat& img, cv::Mat& out_img)
             x++;
             
             // (2,0)
-            r = pixel_r3[j][2];
-            g = pixel_r3[j][1];
-            b = pixel_r3[j][0];
+            r = pixel_r3[j-1][2];
+            g = pixel_r3[j-1][1];
+            b = pixel_r3[j-1][0];
             directNeigh.push(r, g, b, x);
             x++;
             
             // (2,1)
-            r = pixel_r3[j+1][2];
-            g = pixel_r3[j+1][1];
-            b = pixel_r3[j+1][0];
+            r = pixel_r3[j][2];
+            g = pixel_r3[j][1];
+            b = pixel_r3[j][0];
             directNeigh.push(r, g, b, x);
             x++;
             
@@ -182,6 +192,7 @@ void FastMedian(cv::Mat& img, cv::Mat& out_img)
             b = pixel_r3[j+1][0];
             directNeigh.push(r, g, b, x);
             x = 0;
+            
             
             // Get median from the neighborhood
             pix.resize(9);
@@ -204,35 +215,97 @@ void FastMedian(cv::Mat& img, cv::Mat& out_img)
  * Easy-way calling for the actual convolution algorithm
  * Giving a 2D int array, applies convolution to img
  * @param:
- *  Mat input image
- *  [OUTPUT] Mat output image
- *  vector<vector<int>> kernel
- *  [OUTPUT] <vector<Vec3b> neighborhood = Where the pixel's neighbors are set. Must be initialized in the desired size
- *  Coordinate anchor of the kernel
+ *  [INPUT]  Mat: input image
+ *  [OUTPUT] Mat: output image
+ *  [INPUT]  Kernel: kernel object (Read libs/Kernel.h for info)
+ * 
 */
-
-/**
-void Convolution(cv::Mat& img, cv::Mat& out_img, std::vector<std::vector<cv::Vec3b>>& neighborhood, std::vector<std::vector<int>> kernel, Coordinate anchor)
+void Convolution(cv::Mat& img, cv::Mat& out_img, Kernel& kernel)
 {
-    assert(kernel.size() < anchor.x || kernel[0].size() < anchor.y);
+    uchar r, g, b;
+    std::vector<cv::Vec3b*> rows(kernel.size());
     
-    // Iterating trough pixels
-    for(int y = 0; y < img.rows; y++)
-        for(int x = 0; x < img.cols; x++)
+    // Helps to assign rows dynamically
+    int l = 0;
+    
+    // Will let know the kernel where it should take the value
+    int _nRow, _nCol;
+    
+    /// Σ (Summation)
+    /// Each element a color: [0]:B, [1]:G, [2]:R
+    std::vector<int> summation {0,0,0};
+    
+    cv::Vec3b pixel;
+    
+    int z = kernel.size() / 2; // Center of the rows
+    int _z = z * -1; // first row to get
+    
+    for (int i = 0; i < img.rows; ++i)
+    {
+        /// Assign rows in a vector dynamically
+        /// from a n*n kernel (odd sized)
+        for(; _z <= z; ++_z)
         {
-            // Get neighboorhood
-            XYNeighbors(Coordinate(x, y), img, neighborhood);
+            /// Sets first the rows from above the center
+            /// Then sets the center row in the center of the vector
+            /// Sets at last the rows below the center
+            
+            rows[l] = img.ptr<cv::Vec3b>(_z); // Points to _z row
+            l++;
         }
-        
-    ComputeConvolution(img, out_img, neighborhood);
+        for (int j = 0; j < img.cols; ++j)
+        {
+            _nRow = 0;
+            _nCol = 0;
+            std::fill(summation.begin(), summation.end(), 0); // Set summations in zero
+            for(cv::Vec3b* row : rows)
+            {
+                // Current row, pixel from left
+                r = row[j-1][2];
+                g = row[j-1][1];
+                b = row[j-1][0];
+                
+                summation[2] += r * kernel[_nRow][_nCol];
+                summation[1] += g * kernel[_nRow][_nCol];
+                summation[0] += b * kernel[_nRow][_nCol];
+                _nCol++;
+                
+                // Current row, pixel from center
+                r = row[j][2];
+                g = row[j][1];
+                b = row[j][0];
+                
+                summation[2] += r * kernel[_nRow][_nCol];
+                summation[1] += g * kernel[_nRow][_nCol];
+                summation[0] += b * kernel[_nRow][_nCol];
+                _nCol++;
+                
+                // Current row, pixel from right
+                r = row[j+1][2];
+                g = row[j+1][1];
+                b = row[j+1][0];
+                
+                summation[2] += r * kernel[_nRow][_nCol];
+                summation[1] += g * kernel[_nRow][_nCol];
+                summation[0] += b * kernel[_nRow][_nCol];
+                
+                _nRow++;
+                _nCol = 0;
+            }
+            
+            if(kernel.isNormalized)
+            {
+                summation[2] = summation[2] / kernel.normal;
+                summation[1] = summation[1] / kernel.normal;
+                summation[0] = summation[0] / kernel.normal;
+            }
+            
+            
+            pixel[2] = summation[2]; // R
+            pixel[1] = summation[1]; // G
+            pixel[0] = summation[0]; // B
+            
+            out_img.at<cv::Vec3b>(i, j) = pixel;
+        }
+    }
 }
-
-// BGR
-void ComputeConvolution(cv::Mat& img, cv::Mat& out_img, std::vector<std::vector<cv::Vec3b>>& neighborhood)
-{
-    _x = neighborhood.size();
-    _y = neighborhood[0].size();
-    
-    return;
-}
-*/

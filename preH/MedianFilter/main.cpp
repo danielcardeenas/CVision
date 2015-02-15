@@ -29,10 +29,9 @@ int main(int argc, char** argv)
     
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     medianBlur(img, dst, 3);
+    imwrite("medianblur.jpg", dst);
     std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
     std::cout << "Time elapsed opencv: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " Miliseconds" <<std::endl;
-    imwrite("medianblur.jpg", dst);
-    
     
     // Start counting time
     begin = std::chrono::steady_clock::now();

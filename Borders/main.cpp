@@ -1,44 +1,38 @@
 #include <iostream>
+#include <chrono>
+
+#include "opencv2/opencv.hpp"
 #include "Kernel.h"
+#include "Filters.h"
 
 using namespace std;
+using namespace cv;
     
 int main(int argc, char** argv)
 {
-    std::vector<std::vector<int> > v;
+     Mat img, out_img;
+     
+     img = imread(argv[1], CV_LOAD_IMAGE_COLOR);
+     out_img = Mat::zeros(img.size(), img.type());
     
-    //Kernel sob;
-    
-    /*
-    so << {
-        {1,0,1},
-        {-2,0,2},
-        {1,0,1}
-    };
-    
-    
+    // Sobel kernel
     Kernel sob ({
-        {1,0,1},
+        {-1,0,1},
         {-2,0,2},
-        {1,0,1}
+        {-1,0,1}
     });
     
-    sob <<= {
-        {1,0,1},
-        {-2,0,2},
-        {1,0,1}
-    };
-    */
+    // Start counting time
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     
-    Kernel keg(
-        {{1,0,1},
-        {-2,0,2},
-        {1,0,1}}, Coordinate(2,3)
-        );
+    // Where magic happens
+    Convolution(img, out_img, sob);
     
-    cout << keg[1][1] << endl;
-    int d = keg[0][1];
-    cout << d << endl;
+    // Stop counting and print time elapsed
+    std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
+    std::cout << "Time elapsed fast: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " Miliseconds" <<std::endl;
     
-    return 0;
+    // Write image in same directory
+    std::cout << "Writing image... (" << "sobel.jpg" << ")" << std::endl;
+    imwrite("sobel.jpg", out_img);
 }
