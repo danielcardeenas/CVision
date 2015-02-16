@@ -19,14 +19,12 @@ Kernel::Kernel(std::vector<std::vector<int> > v) {
         this->anchor (1, 1);
     else
         this->anchor (0, 0);
-        
-    /// If the sum of the elements is 0
-    /// Do not normalize, since is a magnitude kernel
+
     int normal = KernelSummation();
-    
+
     if (normal == 0)
         this->isNormalized = false;
-    else{
+    else {
         this->normal = normal;
         this->isNormalized = true;
     }
@@ -57,7 +55,7 @@ Kernel::Kernel(std::vector<std::vector<int> > v, Coordinate anchor) {
     }
 }
 
-/// Mods the kernel of an already decalred object. No a constructor.
+/// Mods the kernel of an already declared object. No a constructor.
 void Kernel::operator <<=(std::vector<std::vector<int> > v) {
     /// If kernel is not odd sized, set the default
     if(v.size() % 2 == 0 || v[0].size() % 2 == 0)
@@ -70,17 +68,6 @@ void Kernel::operator <<=(std::vector<std::vector<int> > v) {
         this->anchor (1, 1);
     else
         this->anchor (0, 0);
-    
-    /// If the sum of the elements is 0
-    /// Do not normalize, since is a magnitude kernel
-    int normal = KernelSummation();
-    
-    if (normal == 0)
-        this->isNormalized = false;
-    else{
-        this->normal = normal;
-        this->isNormalized = true;
-    }
 }
 
 /// Access kernel vector elements.

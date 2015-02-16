@@ -10,7 +10,6 @@
 class Kernel {
     private:
         // Vars
-        Coordinate anchor;
         std::vector<std::vector<int> > kernel { {-1,0,1},
                                                 {-2,0,2},
                                                 {-1,0,1} };
@@ -21,8 +20,9 @@ class Kernel {
         
     public:
         // Vars
-        bool isNormalized = false;
+        bool isNormalized = true;
         int normal = 0;
+        Coordinate anchor;
     
         // Ctors
         Kernel();
@@ -36,6 +36,8 @@ class Kernel {
         class Proxy {
             public:
                 Proxy(std::vector<int> _vector) : _vector(_vector) { }
+
+                int size() {return _vector.size();}
                 
                 int& operator[](int index) {
                     if(!(index >= _vector.size() || index < 0))

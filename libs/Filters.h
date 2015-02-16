@@ -5,10 +5,9 @@
 #include "Coordinate.h"
 #include "Kernel.h"
 
-void MedianFilter(cv::Mat& img, cv::Mat& out_img); // Easy-way calling method
 void ComputeMedian(int& x, int& y, cv::Mat& img, cv::Mat& out_img); // Actual filter algorithm
-void FastMedian(cv::Mat& img, cv::Mat& out_img); // Faster median algoritm
+void MedianFilter(cv::Mat& img, cv::Mat& out_img); // Faster median algoritm
 
-void Convolution(cv::Mat& img, cv::Mat& out_img, Kernel& kernel);
+void Convolution(cv::Mat& img, cv::Mat& out_img, Kernel& kernel, int bias = 0);
 
 #endif // __FILTERS_H_INCLUDED__
