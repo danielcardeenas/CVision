@@ -4,7 +4,6 @@
 #include "opencv2/opencv.hpp"
 #include "Kernel.h"
 #include "Filters.h"
-#include "Pixel.h"
 
 using namespace std;
 using namespace cv;
@@ -13,11 +12,9 @@ int main(int argc, char** argv)
 {
      Mat img, out_img;
      
-     img = imread(argv[1], CV_LOAD_IMAGE_COLOR);
+     //img = imread(argv[1], CV_LOAD_IMAGE_COLOR);
+     img = imread(argv[1], CV_LOAD_IMAGE_GRAYSCALE);
      out_img = Mat::zeros(img.size(), img.type());
-
-    int a = img.channels();
-    cout << a << endl;
 
     // Sobel kernel
     Kernel gaus ({
@@ -31,6 +28,10 @@ int main(int argc, char** argv)
             {-2,0,2},
             {-1,0,1}
     });
+
+    //cvtColor(img,img,CV_RGB2GRAY);
+    
+    cout << img.channels() << endl;
 
     // Start counting time
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
