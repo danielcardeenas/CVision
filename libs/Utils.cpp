@@ -4,12 +4,98 @@
 
 std::vector<cv::Vec3b> neighbors;
 
-/**
- * Median value of a std::vector<int>
- * @note: Gets the vector as copy, so the sorting does not affcet the original vector
- * @param std::vector<int>
- * @return int median
-*/
+/// Gets the standard deviation value of an image
+int GetStandardDeviaton(cv::Mat inImg)
+{
+    if (inImg.channels() != 1) { std::cerr << "Cannot apply threshold to non one-channeled image" << std::endl; return -1; }
+    
+    int nRows = inImg.rows;
+    int nCols = inImg.cols;
+
+    if (inImg.isContinuous())
+    {
+        nCols *= nRows;
+        nRows = 1;
+    }
+
+    int i,j;
+    uchar* inRow;
+    std::vector<int> v;
+    for( i = 0; i < nRows; ++i)
+    {
+        inRow = inImg.ptr<uchar>(i);
+        for ( j = 0; j < nCols; ++j)
+        {
+            // Get all the values
+            v.push_back(inRow[j]);
+        }
+    }
+    
+    return static_cast<int>(StandardDeviation(v));
+    
+}
+
+
+/// Standard deviation algorithm
+template <class T>
+double StandardDeviation(std::vector<T> &v)
+{
+    double sum = std::accumulate(v.begin(), v.end(), 0.0);
+    double mean = sum / v.size();
+
+    double sq_sum = std::inner_product(v.begin(), v.end(), v.begin(), 0.0);
+    double stdev = std::sqrt(sq_sum / v.size() - mean * mean);
+
+    return stdev;
+}
+
+/// Gets the mean value of an image
+int GetMean(cv::Mat inImg)
+{
+    if (inImg.channels() != 1) { std::cerr << "Cannot apply threshold to non one-channeled image" << std::endl; return -1; }
+    
+    int nRows = inImg.rows;
+    int nCols = inImg.cols;
+
+    if (inImg.isContinuous())
+    {
+        nCols *= nRows;
+        nRows = 1;
+    }
+
+    int i,j;
+    uchar* inRow;
+    std::vector<int> v;
+    for( i = 0; i < nRows; ++i)
+    {
+        inRow = inImg.ptr<uchar>(i);
+        for ( j = 0; j < nCols; ++j)
+        {
+            // Get all the values
+            v.push_back(inRow[j]);
+        }
+    }
+    
+    return static_cast<int>(Mean(v));
+    
+}
+
+/// Standard deviation algorithm
+template <class T>
+double Mean(std::vector<T> &v)
+{
+    double sum = std::accumulate(v.begin(), v.end(), 0.0);
+    double mean = sum / v.size();
+
+    return mean;
+}
+
+///
+/// Median value of a std::vector<int>
+/// @note: Gets the vector as copy, so the sorting does not affcet the original vector
+/// @param std::vector<int>
+/// @return int median
+/// 
 int Median(std::vector<int> vec)
 {
     int median;
@@ -27,10 +113,33 @@ int Median(std::vector<int> vec)
     return median;
 }
 
-/**
- * Gets all the direct neighbors of a pixel and sets them into
- * std::vector<Vec3b> field -> Global variable
-*/
+///
+/// Replace all pixels of a specific color ina binarized image
+/// Then "copys" the replaced pixels of the binarized image in input image (inImg) 
+/// in order to get a colored view of the borders in the original image
+/// This method assumes both images are the same
+void SpecialReplacePixels(cv::Mat &inImg, cv::Mat &binImg, cv::Vec3b &marker)
+{
+    
+    // Using fast pixel access to set the borders int he original image
+    cv::Vec3b* row;
+    uchar* rowBin;
+    for (int i = 0; i < binImg.rows; ++i)
+    {
+        row = inImg.ptr<cv::Vec3b>(i);
+        rowBin = binImg.ptr<uchar>(i);
+        for (int j = 0; j < binImg.cols; ++j)
+        {
+            if(rowBin[j] == 255)
+                row[j] = marker;
+        }
+    }
+}
+
+/// 
+/// Gets all the direct neighbors of a pixel and sets them into
+/// std::vector<Vec3b> field -> Global variable
+/// 
 void DirectNeighbors(int x, int y, cv::Mat& img, std::vector<cv::Vec3b>& field)
 {
     //cout << "x: " << x << endl;
@@ -157,31 +266,5 @@ void DirectNeighbors(int x, int y, cv::Mat& img, std::vector<cv::Vec3b>& field)
     field.at(7) = img.ptr<cv::Vec3b>(y+1)[x];
     field.at(8) = img.ptr<cv::Vec3b>(y+1)[y+1];
 
-    return;
-}
-
-/**
- * Fills a 2D vector<Vec3b> with the neighbors of the pixel in the Coordenate given
- * @param:
- *  Coordinate coo = Coordinate of the pixel in the image
- *  Mat img = The input image
- *  [OUTPUT] vector<vector<Vec3b>>& neighborhood = The neighboorhood to set
-*/
-
-void XYNeighbors(Coordinate coo, cv::Mat& img, std::vector<std::vector<cv::Vec3b>>& neighborhood)
-{
-    
-     // int _x: X axis of neighbors requested
-     // int _y: Y azis of neighbors requested
-     int _x = neighborhood.size();
-     int _y = neighborhood[0].size();
-    
-    // Iterating trough pixels
-    for(int i = 0; i > _x; i++)
-        for(int j = 0; j > _y; j++)
-        {
-            neighborhood[i][j] = img.ptr<cv::Vec3b>(coo.y+j)[coo.x+i];
-        }
-        
     return;
 }

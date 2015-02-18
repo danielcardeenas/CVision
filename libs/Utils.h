@@ -6,6 +6,11 @@
 
 int Median(std::vector<int> vec); // Median value of a vector
 void DirectNeighbors(int x, int y, cv::Mat& img, std::vector<cv::Vec3b>& field); // For optimization pass the vector as parameter and sets the neighbors to it.
-void XYNeighbors(Coordinate coo, cv::Mat& img, std::vector<std::vector<cv::Vec3b>>& neighborhood);
+void SpecialReplacePixels(cv::Mat &inImg, cv::Mat &binImg, cv::Vec3b &marker);
 
+int GetStandardDeviaton(cv::Mat inImg);
+template <class T> double StandardDeviation(std::vector<T> &v);
+
+int GetMean(cv::Mat inImg);
+template <class T> double Mean(std::vector<T> &v);
 #endif // __UTILS_H_INCLUDED__
