@@ -3,7 +3,7 @@ Detects the borders of a given image and colors them in a striking way.
 
 ### Compiling
 
-Clone this repository and build the tool using [CMake](http://www.cmake.org/download/).
+Clone this repository and build the project using [CMake](http://www.cmake.org/download/).
 
 ```sh
 $ git clone https://github.com/danielcardeenas/CVision.git
