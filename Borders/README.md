@@ -22,6 +22,11 @@ $ ./Borders <img_to_use.jpg>
 4. Special funtion to replace borders colors to output ```final.jpg``` [`SpecialReplacePixels()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L121)
 
 ### Info
-The image used for the **input**: ```img/gears.png```
+**Input**: ```img/gears.png```
+
+<img src="https://github.com/danielcardeenas/CVision/blob/master/Borders/img/gears.png" width="320" height="240" />
 
 **Outputs**: ```final.jpg``` and ```binarized.jpg```
+
+<img src="https://github.com/danielcardeenas/CVision/blob/master/Borders/final.jpg?raw=true" width="320" height="240" />
+<img src="https://github.com/danielcardeenas/CVision/blob/master/Borders/binarized.jpg?raw=true" width="320" height="240" />
