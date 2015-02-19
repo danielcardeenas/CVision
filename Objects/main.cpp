@@ -52,10 +52,8 @@ int main(int argc, char** argv)
     //imshow("bin", final);
     //waitKey(-1);
 
-    ObjectDetection(final, colorImg);
+    FloodFill(final, colorImg);
 
-    imshow("back.jpg", colorImg);
-    waitKey(-1);
-    /// TODO:
-    /// Change borders color
+    imwrite("final.jpg", colorImg);
+    //waitKey(-1);
 }

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stack>
 #include <set>
+#include <curses.h>
 
 #include "Utils.h"
 #include "Coordinate.h"
@@ -141,82 +142,27 @@ void SpecialReplacePixels(cv::Mat &inImg, cv::Mat &binImg, cv::Vec3b &marker)
 
 ///
 /// Detect objects
-
-cv::Mat normalDetection(cv::Mat& inImg)
-{
-    if (inImg.channels() != 1) { std::cerr << "Cannot apply threshold to non one-channeled image" << std:: endl; }
-    
-    int nRows = inImg.rows;
-    int nCols = inImg.cols;
-
-    if (inImg.isContinuous())
-    {
-        nCols *= nRows;
-        nRows = 1;
-    }
-    
-    cv::Mat colorImg;
-    cvtColor(inImg, colorImg, CV_GRAY2RGB);
-
-    uchar border = 255; // Borders are black. in this test 
-    cv::Vec3b backdroundMarker;
-    backdroundMarker[2] = 0;
-    backdroundMarker[1] = 0;
-    backdroundMarker[0] = 255;
-    
-    cv::Vec3b backdroundMarker2;
-    backdroundMarker[2] = 0;
-    backdroundMarker[1] = 255;
-    backdroundMarker[0] = 255;
-    
-    int i,j;
-    
-    bool newRowShape = false;
-    
-    cv::Vec3b* colorInRow;
-    uchar* inRow;
-    uchar* prevRow;
-    uchar* nextRow;
-    for( i = 0; i < nRows; ++i)
-    {
-        colorInRow = colorImg.ptr<cv::Vec3b>(i);
-        inRow = inImg.ptr<uchar>(i);
-        prevRow = inImg.ptr<uchar>(i-1);
-        nextRow = inImg.ptr<uchar>(i+1);
-        for ( j = 0; j < nCols; ++j)
-        {
-            if(inRow[j] != border)
-            {
-                // Background touched
-                colorInRow[j] = backdroundMarker;
-            }
-            else{
-                colorInRow[j] = backdroundMarker2;
-            }
-        }
-    }
-    
-    return colorImg;
-}
-
-void ObjectDetection(cv::Mat& inImg, cv::Mat& outImg)
+void FloodFill(cv::Mat& inImg, cv::Mat& outImg)
 {
     int MAXH = inImg.rows;
     int MAXW = inImg.cols;
 
     uchar border = 255;
     uchar current;
+
     Coordinate point;
 
-    Coordinate rightCoo;
-    Coordinate leftCoo;
-    Coordinate upCoo;
-    Coordinate downCoo;
-
+    // Current for position
     cv::Vec3b marker;
     marker[2] = 0;
     marker[1] = 0;
     marker[0] = 255;
+
+    // Current dfs position
+    cv::Vec3b dfsMarker;
+    dfsMarker[2] = 255;
+    dfsMarker[1] = 0;
+    dfsMarker[0] = 0;
 
     /// Create window
     //char* window_name = "Demo";
@@ -226,61 +172,62 @@ void ObjectDetection(cv::Mat& inImg, cv::Mat& outImg)
     std::stack<Coordinate> stack;
     std::vector<Coordinate> visited;
 
-    int debugiteration = 0;
+    // Things detected, including background
+    int things = 0;
 
-    for (int i = 0; i < MAXW; i++)
+    for (int i = 0; i < MAXH - 1; i++)
     {
-        for (int j = 0; j < MAXH; j++)
+        for (int j = 0; j < MAXW - 1; j++)
         {
-            stack.push(Coordinate(i,j));
+            outImg.at<cv::Vec3b>(i, j) = marker;
+            stack.push(Coordinate(j, i));
 
-            if(current != border && !FindItem(visited, point))
+            current = inImg.at<uchar>(i, j);
+
+            if(current != 128 && current != border)
+                things ++;
+
+            while(!stack.empty())
             {
-                debugiteration ++;
-
-                while(!stack.empty())
+                point = stack.top();
+                stack.pop();
+                if(inImg.at<uchar>(point.y, point.x) != 128 && inImg.at<uchar>(point.y, point.x) != border)
                 {
-                    point = stack.top();
-                    current = inImg.at<uchar>(point.x, point.y);
+                    // If not already spotted before
+                    // Spot it and show it
+                    inImg.at<uchar>(point.y, point.x) = 128;
+                    outImg.at<cv::Vec3b>(point.y, point.x) = dfsMarker;
 
-                    stack.pop();
-
-                    if (point.y < 0 || point.y > MAXH - 1 || point.x < 0 || point.x > MAXW - 1)
-                        continue;
-
-                    visited.push_back(point);
                     c = cv::waitKey(1);
                     if( (char)c == 27 )
                     { break; }
 
-                    // Not border. so start coloring
-                    //outImg.at<cv::Vec3b>(point.x, point.y) = marker;
-                    inImg.at<uchar>(point.x, point.y) = 128;
+                    cv::imshow("Demo", outImg);
 
-                    // Show
-                    //cv::imshow("Demo", outImg);
-                    cv::imshow("Demo", inImg);
-
-                    rightCoo = Coordinate(point.x + 1, point.y);
-                    leftCoo = Coordinate(point.x - 1, point.y);
-                    upCoo = Coordinate(point.x, point.y + 1);
-                    downCoo = Coordinate(point.x, point.y - 1);
-
-                    // 4-way neighbors
-                    if(point.x + 1 < MAXW - 1 && !FindItem(visited, rightCoo))
-                        stack.push(Coordinate(point.x + 1, point.y));
-                    if(point.x - 1 > 0 && !FindItem(visited, leftCoo))
-                        stack.push(Coordinate(point.x - 1, point.y));
-                    if(point.y + 1 < MAXH - 1 && !FindItem(visited, upCoo))
+                    /// Add neighbors to stack
+                    /// They must be inside of bounds and must have not been spotted before
+                    ///
+                    // Below neighbor
+                    if((point.y + 1 < MAXH - 1) && inImg.at<uchar>(point.y + 1, point.x) != 128)
                         stack.push(Coordinate(point.x, point.y + 1));
-                    if(point.y - 1 > 0 && !FindItem(visited, downCoo))
+
+                    // Above neighbor
+                    if((point.y - 1 > 0) && inImg.at<uchar>(point.y - 1, point.x) != 128)
                         stack.push(Coordinate(point.x, point.y - 1));
+
+                    // Left neighbor
+                    if((point.x - 1 > 0) && inImg.at<uchar>(point.y, point.x - 1) != 128)
+                        stack.push(Coordinate(point.x - 1, point.y));
+
+                    // Right neighbor
+                    if((point.x + 1 < MAXW - 1) && inImg.at<uchar>(point.y, point.x + 1) != 128)
+                        stack.push(Coordinate(point.x + 1, point.y));
                 }
             }
         }
     }
 
-    std::cout << debugiteration << std::endl;
+    std::cout << things << std::endl;
 }
 
 template <typename T>

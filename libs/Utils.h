@@ -14,8 +14,7 @@ template <class T> double StandardDeviation(std::vector<T> &v);
 int GetMean(cv::Mat inImg);
 template <class T> double Mean(std::vector<T> &v);
 
-cv::Mat normalDetection(cv::Mat& inImg);
-void ObjectDetection(cv::Mat& inImg, cv::Mat& outImg);
+void FloodFill(cv::Mat& inImg, cv::Mat& outImg);
 
 template <typename T> bool FindItem(std::vector<T> &mySet, T &item);
 #endif // __UTILS_H_INCLUDED__
