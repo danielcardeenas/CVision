@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stack>
+#include <set>
 
 #include "Utils.h"
 #include "Coordinate.h"
@@ -198,44 +199,101 @@ cv::Mat normalDetection(cv::Mat& inImg)
     return colorImg;
 }
 
-void Floodfill(cv::Mat& vals, Coordinate q, uchar SEED_COLOR, uchar COLOR)
+void ObjectDetection(cv::Mat& inImg, cv::Mat& outImg)
 {
-    
-    int h = vals.rows;
-    int w = vals.cols;
+    int MAXH = inImg.rows;
+    int MAXW = inImg.cols;
 
-    if (q.y < 0 || q.y > h - 1 || q.x < 0 || q.y > w - 1)
-    	return;
+    uchar border = 255;
+    uchar current;
+    Coordinate point;
 
-    std::stack<Coordinate> *stack = new std::stack<Coordinate>;
-    stack->push(q);
-    while (!stack->empty())
+    Coordinate rightCoo;
+    Coordinate leftCoo;
+    Coordinate upCoo;
+    Coordinate downCoo;
+
+    cv::Vec3b marker;
+    marker[2] = 0;
+    marker[1] = 0;
+    marker[0] = 255;
+
+    /// Create window
+    //char* window_name = "Demo";
+    int c;
+    //cv::namedWindow( "Demo", CV_WINDOW_AUTOSIZE );
+
+    std::stack<Coordinate> stack;
+    std::vector<Coordinate> visited;
+
+    int debugiteration = 0;
+
+    for (int i = 0; i < MAXW; i++)
     {
-    	Coordinate p = stack->top();
-    	stack->pop();
-    	
-    	int x = p.x;
-    	int y = p.y;
-    	if (y < 0 || y > h - 1 || x < 0 || x > w - 1)
-    		continue;
-    	uchar val = vals.at<uchar>(x, y);
-    	if (val == SEED_COLOR)
-    	{
-    		vals.at<uchar>(y, x) = COLOR;
-    		stack->push(Coordinate(x + 1, y));
-    		stack->push(Coordinate(x - 1, y));
-    		stack->push(Coordinate(x, y + 1));
-    		stack->push(Coordinate(x, y - 1));
-    	}
+        for (int j = 0; j < MAXH; j++)
+        {
+            stack.push(Coordinate(i,j));
+
+            if(current != border && !FindItem(visited, point))
+            {
+                debugiteration ++;
+
+                while(!stack.empty())
+                {
+                    point = stack.top();
+                    current = inImg.at<uchar>(point.x, point.y);
+
+                    stack.pop();
+
+                    if (point.y < 0 || point.y > MAXH - 1 || point.x < 0 || point.x > MAXW - 1)
+                        continue;
+
+                    visited.push_back(point);
+                    c = cv::waitKey(1);
+                    if( (char)c == 27 )
+                    { break; }
+
+                    // Not border. so start coloring
+                    //outImg.at<cv::Vec3b>(point.x, point.y) = marker;
+                    inImg.at<uchar>(point.x, point.y) = 128;
+
+                    // Show
+                    //cv::imshow("Demo", outImg);
+                    cv::imshow("Demo", inImg);
+
+                    rightCoo = Coordinate(point.x + 1, point.y);
+                    leftCoo = Coordinate(point.x - 1, point.y);
+                    upCoo = Coordinate(point.x, point.y + 1);
+                    downCoo = Coordinate(point.x, point.y - 1);
+
+                    // 4-way neighbors
+                    if(point.x + 1 < MAXW - 1 && !FindItem(visited, rightCoo))
+                        stack.push(Coordinate(point.x + 1, point.y));
+                    if(point.x - 1 > 0 && !FindItem(visited, leftCoo))
+                        stack.push(Coordinate(point.x - 1, point.y));
+                    if(point.y + 1 < MAXH - 1 && !FindItem(visited, upCoo))
+                        stack.push(Coordinate(point.x, point.y + 1));
+                    if(point.y - 1 > 0 && !FindItem(visited, downCoo))
+                        stack.push(Coordinate(point.x, point.y - 1));
+                }
+            }
+        }
     }
-    
-    delete stack;
+
+    std::cout << debugiteration << std::endl;
+}
+
+template <typename T>
+bool FindItem(std::vector<T>& mySet, T& item)
+{
+    bool found = (std::find(mySet.begin(), mySet.end(), item) != mySet.end());
+    return found;
 }
 
 /// 
 /// Gets all the direct neighbors of a pixel and sets them into
 /// std::vector<Vec3b> field -> Global variable
-/// TODO: Optimize this, since the pixel acces it's very slow
+/// TODO: Optimize this, since the pixel access it's very slow
 /// 
 void DirectNeighbors(int x, int y, cv::Mat& img, std::vector<cv::Vec3b>& field)
 {

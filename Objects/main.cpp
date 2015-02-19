@@ -10,8 +10,6 @@
 using namespace std;
 using namespace cv;
 
-void TimeFunc( void (*f)(int) );
-
 int main(int argc, char** argv)
 {
     Mat colorImg = imread(argv[1], CV_LOAD_IMAGE_COLOR);
@@ -50,13 +48,14 @@ int main(int argc, char** argv)
     DeviationThreshold(joinImg, final);
     // LazyThreshold(out_img, final);
     // MeanThreshold(out_img, finalmean);
-    
-    Floodfill(final, Coordinate(0, 0), 0, 128);
-    
-    imwrite("back.jpg", final);
-    
-    
-    
+
+    //imshow("bin", final);
+    //waitKey(-1);
+
+    ObjectDetection(final, colorImg);
+
+    imshow("back.jpg", colorImg);
+    waitKey(-1);
     /// TODO:
     /// Change borders color
 }

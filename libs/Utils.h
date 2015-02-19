@@ -15,5 +15,7 @@ int GetMean(cv::Mat inImg);
 template <class T> double Mean(std::vector<T> &v);
 
 cv::Mat normalDetection(cv::Mat& inImg);
-void Floodfill(cv::Mat& vals, Coordinate q, uchar SEED_COLOR, uchar COLOR);
+void ObjectDetection(cv::Mat& inImg, cv::Mat& outImg);
+
+template <typename T> bool FindItem(std::vector<T> &mySet, T &item);
 #endif // __UTILS_H_INCLUDED__
