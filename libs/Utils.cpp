@@ -1,4 +1,6 @@
 #include <iostream>
+#include <stack>
+
 #include "Utils.h"
 #include "Coordinate.h"
 
@@ -136,9 +138,104 @@ void SpecialReplacePixels(cv::Mat &inImg, cv::Mat &binImg, cv::Vec3b &marker)
     }
 }
 
+///
+/// Detect objects
+
+cv::Mat normalDetection(cv::Mat& inImg)
+{
+    if (inImg.channels() != 1) { std::cerr << "Cannot apply threshold to non one-channeled image" << std:: endl; }
+    
+    int nRows = inImg.rows;
+    int nCols = inImg.cols;
+
+    if (inImg.isContinuous())
+    {
+        nCols *= nRows;
+        nRows = 1;
+    }
+    
+    cv::Mat colorImg;
+    cvtColor(inImg, colorImg, CV_GRAY2RGB);
+
+    uchar border = 255; // Borders are black. in this test 
+    cv::Vec3b backdroundMarker;
+    backdroundMarker[2] = 0;
+    backdroundMarker[1] = 0;
+    backdroundMarker[0] = 255;
+    
+    cv::Vec3b backdroundMarker2;
+    backdroundMarker[2] = 0;
+    backdroundMarker[1] = 255;
+    backdroundMarker[0] = 255;
+    
+    int i,j;
+    
+    bool newRowShape = false;
+    
+    cv::Vec3b* colorInRow;
+    uchar* inRow;
+    uchar* prevRow;
+    uchar* nextRow;
+    for( i = 0; i < nRows; ++i)
+    {
+        colorInRow = colorImg.ptr<cv::Vec3b>(i);
+        inRow = inImg.ptr<uchar>(i);
+        prevRow = inImg.ptr<uchar>(i-1);
+        nextRow = inImg.ptr<uchar>(i+1);
+        for ( j = 0; j < nCols; ++j)
+        {
+            if(inRow[j] != border)
+            {
+                // Background touched
+                colorInRow[j] = backdroundMarker;
+            }
+            else{
+                colorInRow[j] = backdroundMarker2;
+            }
+        }
+    }
+    
+    return colorImg;
+}
+
+void Floodfill(cv::Mat& vals, Coordinate q, uchar SEED_COLOR, uchar COLOR)
+{
+    
+    int h = vals.rows;
+    int w = vals.cols;
+
+    if (q.y < 0 || q.y > h - 1 || q.x < 0 || q.y > w - 1)
+    	return;
+
+    std::stack<Coordinate> *stack = new std::stack<Coordinate>;
+    stack->push(q);
+    while (!stack->empty())
+    {
+    	Coordinate p = stack->top();
+    	stack->pop();
+    	
+    	int x = p.x;
+    	int y = p.y;
+    	if (y < 0 || y > h - 1 || x < 0 || x > w - 1)
+    		continue;
+    	uchar val = vals.at<uchar>(x, y);
+    	if (val == SEED_COLOR)
+    	{
+    		vals.at<uchar>(y, x) = COLOR;
+    		stack->push(Coordinate(x + 1, y));
+    		stack->push(Coordinate(x - 1, y));
+    		stack->push(Coordinate(x, y + 1));
+    		stack->push(Coordinate(x, y - 1));
+    	}
+    }
+    
+    delete stack;
+}
+
 /// 
 /// Gets all the direct neighbors of a pixel and sets them into
 /// std::vector<Vec3b> field -> Global variable
+/// TODO: Optimize this, since the pixel acces it's very slow
 /// 
 void DirectNeighbors(int x, int y, cv::Mat& img, std::vector<cv::Vec3b>& field)
 {

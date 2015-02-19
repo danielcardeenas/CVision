@@ -13,4 +13,7 @@ template <class T> double StandardDeviation(std::vector<T> &v);
 
 int GetMean(cv::Mat inImg);
 template <class T> double Mean(std::vector<T> &v);
+
+cv::Mat normalDetection(cv::Mat& inImg);
+void Floodfill(cv::Mat& vals, Coordinate q, uchar SEED_COLOR, uchar COLOR);
 #endif // __UTILS_H_INCLUDED__
