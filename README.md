@@ -1,5 +1,4 @@
 # CVision
-=======
 
 Dependencies of these tools:
 
