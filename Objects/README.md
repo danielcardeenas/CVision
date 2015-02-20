@@ -36,8 +36,8 @@ Lazy [`LazyThreshold()`](https://github.com/danielcardeenas/CVision/blob/master/
 <img src="https://github.com/danielcardeenas/CVision/blob/master/Objects/img/circles.jpg?raw=true" width="320" height="240" />
 <img src="https://github.com/danielcardeenas/CVision/blob/master/Objects/final.jpg?raw=true" width="320" height="240" />
 
-**Input**: ```img/circles.jpg```
-**Outputs**: ```final.jpg```
+**Input**: ```img/onepiece.png```
+**Outputs**: ```onepiece.jpg```
 
 <img src="https://github.com/danielcardeenas/CVision/blob/master/Objects/img/onepiece.png?raw=true" width="320" height="240" />
 <img src="https://github.com/danielcardeenas/CVision/blob/master/Objects/onepiece.jpg?raw=true" width="320" height="240" />
