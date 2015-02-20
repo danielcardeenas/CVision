@@ -6,6 +6,10 @@ void Neighborhood::push(uchar r, uchar g, uchar b, int x) {
     this->oned_neighborhood[x][0] = b;
 }
 
+void Neighborhood::push(uchar gray, int x) {
+    this->oned_neighborhood[x] = gray;
+}
+
 int Neighborhood::sum(int index) {
     return (
         this->oned_neighborhood[index][0] +

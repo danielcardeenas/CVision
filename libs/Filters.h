@@ -7,6 +7,7 @@
 
 void ComputeMedian(int& x, int& y, cv::Mat& img, cv::Mat& out_img); // Actual filter algorithm
 void MedianFilter(cv::Mat& img, cv::Mat& out_img); // Faster median algoritm
+void MedianFilterGray(cv::Mat& img, cv::Mat& out_img); // On the go algorithm (Work to do later but for now it's just fine)
 
 void Convolution(cv::Mat& img, cv::Mat& out_img, Kernel& kernel, int bias = 0);
 void ConvolutionRGB(cv::Mat& img, cv::Mat& out_img, Kernel& kernel, int bias = 0);
