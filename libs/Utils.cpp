@@ -146,6 +146,42 @@ void SpecialReplacePixels(cv::Mat &inImg, cv::Mat &binImg, cv::Vec3b &marker)
 /// Flood fill every object detected on the image by DFS
 void FloodFill(cv::Mat& inImg, cv::Mat& outImg)
 {
+    /**
+    * Binarize image
+    */
+    cv::Mat joinImg = cv::Mat::zeros(inImg.size(), inImg.type());
+    cv::Mat imgAbs = cv::Mat::zeros(inImg.size(), inImg.type());
+    cv::Mat gradY = cv::Mat::zeros(inImg.size(), inImg.type());
+    cv::Mat gradX = cv::Mat::zeros(inImg.size(), inImg.type());
+    cv::Mat bin = cv::Mat::zeros(inImg.size(), inImg.type());
+
+    // Supports n*n size
+    /// As long it's odd sized and squared (same size for the 2 dimensions)
+    /// Kernel.cpp for more info
+    Kernel soby ({
+            {1,2,1},
+            {0,0,0},
+            {-1,-2,-1}
+    });
+
+    Kernel sobx ({
+            {-1,0,1},
+            {-2,0,2},
+            {-1,0,1}
+    });
+
+    /// Filters.cpp for more info
+    Convolution(inImg, gradX, sobx);
+    Convolution(inImg, gradY, soby);
+
+    /// Filters.cpp for more info
+    EuclidianJoin(gradX, gradY, joinImg);
+    // AbsJoin(gradX, gradY, joinImg);
+
+    /// Filters.cpp for more info
+    DeviationThreshold(joinImg, inImg);
+    //LazyThreshold(joinImg, inImg);
+
     int MAXH = inImg.rows;
     int MAXW = inImg.cols;
 
@@ -164,7 +200,7 @@ void FloodFill(cv::Mat& inImg, cv::Mat& outImg)
     // Current dfs position
     cv::Vec3b dfsMarker;
     dfsMarker[2] = 255;
-    dfsMarker[1] = 0;
+    dfsMarker[1] = 145;
     dfsMarker[0] = 0;
 
     /// Create window
@@ -199,9 +235,9 @@ void FloodFill(cv::Mat& inImg, cv::Mat& outImg)
                     // If not already spotted before
                     // Spot it and show it
                     inImg.at<uchar>(point.y, point.x) = spotted;
-                    //outImg.at<cv::Vec3b>(point.y, point.x) = dfsMarker;
+                    outImg.at<cv::Vec3b>(point.y, point.x) = dfsMarker;
 
-                    cv::imshow("Demo", inImg);
+                    cv::imshow("Demo", outImg);
                     cv::waitKey(1);
 
                     /// Add neighbors to stack
