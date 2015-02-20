@@ -25,7 +25,7 @@ $ ./objects <img_to_use.jpg>
 Mean [`GetMean()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L59) and 
 Lazy [`LazyThreshold()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Filters.cpp#L445) thresholding also available).
 
-+ This functiongs gets the objects detected properties [`GetShapes()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L316)
++ This functiongs gets the objects and it's properties [`GetShapes()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L316)
 + This one draws the bounding box of the shapes and their names in the image 
 [`DrawShapes()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L398)
 
