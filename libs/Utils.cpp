@@ -279,7 +279,7 @@ void DetectShapes(cv::Mat& inImg, cv::Mat& outImg)
     std::vector<Shape> shapes;
 
     // Supports n*n size
-    /// As long it's odd sized and squared (same size for the 2 dimensions)
+    /// As long it's odd sized and squared
     /// Kernel.cpp for more info
     Kernel soby ({
             {1,2,1},
@@ -371,7 +371,7 @@ std::vector<Shape> GetShapes(cv::Mat& inImg)
                     /// Add neighbors to stack
                     /// They must be inside of bounds and must have not been spotted before
                     // Below neighbor
-                    if((point.y + 1 < MAXH - 1) && inImg.at<uchar>(point.y + 1, point.x) != spotted)
+                    if((point.y + 1 < MAXH) && inImg.at<uchar>(point.y + 1, point.x) != spotted)
                         stack.push(Coordinate(point.x, point.y + 1));
 
                     // Above neighbor
@@ -383,7 +383,7 @@ std::vector<Shape> GetShapes(cv::Mat& inImg)
                         stack.push(Coordinate(point.x - 1, point.y));
 
                     // Right neighbor
-                    if((point.x + 1 < MAXW - 1) && inImg.at<uchar>(point.y, point.x + 1) != spotted)
+                    if((point.x + 1 < MAXW) && inImg.at<uchar>(point.y, point.x + 1) != spotted)
                         stack.push(Coordinate(point.x + 1, point.y));
                 }
             }
