@@ -156,7 +156,7 @@ void FloodFill(cv::Mat& inImg, cv::Mat& outImg)
     cv::Mat bin = cv::Mat::zeros(inImg.size(), inImg.type());
 
     // Supports n*n size
-    /// As long it's odd sized and squared (same size for the 2 dimensions)
+    /// As long it's odd sized and squared
     /// Kernel.cpp for more info
     Kernel soby ({
             {1,2,1},
@@ -235,16 +235,16 @@ void FloodFill(cv::Mat& inImg, cv::Mat& outImg)
                     // If not already spotted before
                     // Spot it and show it
                     inImg.at<uchar>(point.y, point.x) = spotted;
-                    outImg.at<cv::Vec3b>(point.y, point.x) = dfsMarker;
+                    //outImg.at<cv::Vec3b>(point.y, point.x) = dfsMarker;
 
-                    cv::imshow("Demo", outImg);
-                    cv::waitKey(1);
+                    //cv::imshow("Demo", outImg);
+                    //cv::waitKey(1);
 
                     /// Add neighbors to stack
                     /// They must be inside of bounds and must have not been spotted before
                     ///
                     // Below neighbor
-                    if((point.y + 1 < MAXH - 1) && inImg.at<uchar>(point.y + 1, point.x) != spotted)
+                    if((point.y + 1 < MAXH) && inImg.at<uchar>(point.y + 1, point.x) != spotted)
                         stack.push(Coordinate(point.x, point.y + 1));
 
                     // Above neighbor
@@ -256,7 +256,7 @@ void FloodFill(cv::Mat& inImg, cv::Mat& outImg)
                         stack.push(Coordinate(point.x - 1, point.y));
 
                     // Right neighbor
-                    if((point.x + 1 < MAXW - 1) && inImg.at<uchar>(point.y, point.x + 1) != spotted)
+                    if((point.x + 1 < MAXW) && inImg.at<uchar>(point.y, point.x + 1) != spotted)
                         stack.push(Coordinate(point.x + 1, point.y));
                 }
             }
@@ -408,7 +408,7 @@ void DrawShapes(cv::Mat& inImg, std::vector<Shape> shapes)
         // Draw rectangle
         int thickness = 2;
         cv::Scalar color = cv::Scalar(rng.uniform(0,255), rng.uniform(0, 255), rng.uniform(0, 255));
-        std::cout << color << std::endl;
+        //std::cout << color << std::endl;
         cv::Point pt1 (box[1].x, box[1].y);
         cv::Point pt2 (box[3].x, box[3].y);
         cv::rectangle(inImg,
