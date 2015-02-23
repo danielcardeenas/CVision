@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="CPP_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../libs/Coordinate.cpp">
+      <sourceFolder url="file://$MODULE_DIR$/../libs/Coordinate.cpp" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../libs/Filters.cpp">
+      <sourceFolder url="file://$MODULE_DIR$/../libs/Filters.cpp" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../libs/Kernel.cpp">
+      <sourceFolder url="file://$MODULE_DIR$/../libs/Kernel.cpp" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../libs/Neighborhood.cpp">
+      <sourceFolder url="file://$MODULE_DIR$/../libs/Neighborhood.cpp" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../libs/Shape.cpp">
+      <sourceFolder url="file://$MODULE_DIR$/../libs/Shape.cpp" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../libs/Utils.cpp">
+      <sourceFolder url="file://$MODULE_DIR$/../libs/Utils.cpp" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../preH/MedianFilter">
+      <sourceFolder url="file://$MODULE_DIR$/../preH/MedianFilter" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

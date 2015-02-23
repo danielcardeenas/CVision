@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 2.8.4)
-project(MedianFilter)
+project(median)
 
 find_package(OpenCV REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+#SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${median_SOURCE_DIR})
 
 include_directories(../../libs)
 
@@ -22,6 +23,6 @@ set(LIB_FILES
     ../../libs/Shape.cpp
     ../../libs/Shape.h
     )
-    
-add_executable(MedianFilter ${SOURCE_FILES} ${LIB_FILES})
-target_link_libraries(MedianFilter ${OpenCV_LIBS})
+
+add_executable(median ${SOURCE_FILES} ${LIB_FILES})
+target_link_libraries(median ${OpenCV_LIBS})

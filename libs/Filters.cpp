@@ -124,43 +124,41 @@ void MedianFilterGray(cv::Mat& img, cv::Mat& out_img)
     int nCols = img.cols;
     
     // 3x3 vector. Neighbordhood area
-    std::vector<std::vector<uchar>> area(3, std::vector<uchar>(3));
-
-    if (img.isContinuous())
-    {
-        nCols *= nRows;
-        nRows = 1;
-    }
+    std::vector<uchar> area(9);
 
     int i,j;
     uchar* upRow;
     uchar* centerRow;
     uchar* belowRow;
+    uchar* outRow;
     for( i = 1; i < nRows - 1; ++i)
     {
         upRow = img.ptr<uchar>(i-1);
         centerRow = img.ptr<uchar>(i);
         belowRow = img.ptr<uchar>(i+1);
+        outRow = out_img.ptr<uchar>(i);
         for ( j = 1; j < nCols - 1; ++j)
         {
             /// Get neighbordhood
             
             // Above row
-            area[0][0] = upRow[j - 1];
-            area[0][1] = upRow[j];
-            area[0][2] = upRow[j + 1];
+            area[0] = upRow[j - 1];
+            area[1] = upRow[j];
+            area[2] = upRow[j + 1];
             
             // Middle row
-            area[1][0] = centerRow[j - 1];
-            area[1][1] = centerRow[j];
-            area[1][2] = centerRow[j + 1];
+            area[3] = centerRow[j - 1];
+            area[4] = centerRow[j];
+            area[5] = centerRow[j + 1];
             
             // Below row
-            area[2][0] = belowRow[j - 1];
-            area[2][1] = belowRow[j];
-            area[2][2] = belowRow[j + 1];
-            
-            centerRow[j] = MedianFromROI(area);
+            area[6] = belowRow[j - 1];
+            area[7] = belowRow[j];
+            area[8] = belowRow[j + 1];
+
+            // Get median
+            std::sort(area.begin(), area.end());
+            outRow[j] = area[4];
         }
     }
 }
@@ -288,9 +286,15 @@ void ConvolutionGrayscale(cv::Mat& img, cv::Mat& out_img, Kernel& kernel, int bi
     int _w = 0; // Column position (can be negative values)
     int logicColumn = 0; // Logical position in vector for row from _z
 
+    uchar *out_imgRow;
+    int anchorX = kernel.anchor.x;
+    int anchorY = kernel.anchor.y;
+
     /// This loop does not touch borders nor corners
     for (int i = z; i < img.rows-z; ++i)
     {
+        out_imgRow = out_img.ptr<uchar>(anchorX + i - 1);
+
         /// Generate rows needed giving a kernel size
         /// Assign rows in a vector dynamically
         /// from a n*n kernel (odd sized)
@@ -333,7 +337,7 @@ void ConvolutionGrayscale(cv::Mat& img, cv::Mat& out_img, Kernel& kernel, int bi
             pixel = std::min(std::abs(summation) + bias, 255); // R
 
             // Draw pixel in the kernel anchor position
-            out_img.ptr<uchar>(kernel.anchor.x + i - 1)[kernel.anchor.y + j - 1] = pixel;
+            out_imgRow[anchorY + j - 1] = pixel;
         }
     }
 }

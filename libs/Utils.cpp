@@ -271,43 +271,8 @@ void FloodFill(cv::Mat& inImg, cv::Mat& outImg)
 /// Assumes the image has not been binarized so it will do all the proccess
 void DetectShapes(cv::Mat& inImg, cv::Mat& outImg)
 {
-    cv::Mat joinImg = cv::Mat::zeros(inImg.size(), inImg.type());
-    cv::Mat imgAbs = cv::Mat::zeros(inImg.size(), inImg.type());
-    cv::Mat gradY = cv::Mat::zeros(inImg.size(), inImg.type());
-    cv::Mat gradX = cv::Mat::zeros(inImg.size(), inImg.type());
-    cv::Mat bin = cv::Mat::zeros(inImg.size(), inImg.type());
-
     std::vector<Shape> shapes;
-
-    // Supports n*n size
-    /// As long it's odd sized and squared
-    /// Kernel.cpp for more info
-    Kernel soby ({
-            {1,2,1},
-            {0,0,0},
-            {-1,-2,-1}
-    });
-
-    Kernel sobx ({
-            {-1,0,1},
-            {-2,0,2},
-            {-1,0,1}
-    });
-
-    /// Filters.cpp for more info
-    Convolution(inImg, gradX, sobx);
-    Convolution(inImg, gradY, soby);
-
-    /// Filters.cpp for more info
-    EuclidianJoin(gradX, gradY, joinImg);
-    // AbsJoin(gradX, gradY, joinImg);
-
-    /// Filters.cpp for more info
-    //DeviationThreshold(joinImg, final);
-    LazyThreshold(joinImg, bin);
-    // MeanThreshold(joinImg, final);
-
-    shapes = GetShapes(bin);
+    shapes = GetShapes(inImg);
 
     DrawShapes(outImg, shapes);
 }
@@ -437,31 +402,6 @@ bool FindItem(std::vector<T>& mySet, Coordinate item)
 {
     bool found = (std::find(mySet.begin(), mySet.end(), item) != mySet.end());
     return found;
-}
-
-uchar MedianFromROI(std::vector<std::vector<uchar> > &I)
-{
-    int median;
-    int n;
-    std::map<uchar, int> hist = CalcROIHistogram(I);
-    
-    for(std::map<uchar,int>::iterator ii = hist.begin(); ii != hist.end(); ++ii)
-        n += ii->second;
-        
-    /// Formula of getting median from histogram:
-    /// m = (n+1)/2
-    median = (n + 1) / 2;
-     
-    int temp = 0;   
-    for(std::map<uchar,int>::iterator ii = hist.begin(); ii != hist.end(); ++ii)
-    {
-        if (ii->second + temp >= median)
-            return ii->first;
-        else
-            temp += ii -> second;
-    }
-    
-    return median;
 }
 
 /// Get histogram from grayscale
