@@ -37,7 +37,7 @@ int main(int argc, char** argv)
     begin = std::chrono::steady_clock::now();
     
     // Where magic happens
-    MedianFilterGray(img, out_img);
+    MedianFilter(img, out_img);
     
     // Stop counting and print time elapsed
     end= std::chrono::steady_clock::now();

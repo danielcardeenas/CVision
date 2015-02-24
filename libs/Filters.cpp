@@ -1,6 +1,7 @@
 #include <iostream>
 #include <math.h> 
 #include <map>
+#include <thread>
 
 #include "Utils.h"
 #include "Filters.h"
@@ -11,7 +12,6 @@ std::vector<int> pix(9);
 std::vector<int>::iterator it;
 
 /**
- * Two times faster than my normal median filter
  * Still not as fast the opencv implementation.
  * Only works with a 3x3 neighborhood
  * @param 
@@ -19,6 +19,14 @@ std::vector<int>::iterator it;
  *  [OUTPUT] Mat: image to output (Cannot be the same as input)
 */
 void MedianFilter(cv::Mat& img, cv::Mat& out_img)
+{
+    if (img.channels() > 1)
+        MedianFilterRGB(img, out_img);
+    else
+        MedianFilterGray(img, out_img);
+}
+
+void MedianFilterRGB(cv::Mat& img, cv::Mat& out_img)
 {
     uchar r, g, b;
     int x = 0;
@@ -125,6 +133,9 @@ void MedianFilterGray(cv::Mat& img, cv::Mat& out_img)
     
     // 3x3 vector. Neighbordhood area
     std::vector<uchar> area(9);
+    int rangeUp[] = {0, 1, 2};
+    int rangeCenter[] = {3, 4, 5};
+    int rangeBelow[] = {6, 7, 8};
 
     int i,j;
     uchar* upRow;
@@ -142,25 +153,35 @@ void MedianFilterGray(cv::Mat& img, cv::Mat& out_img)
             /// Get neighbordhood
             
             // Above row
-            area[0] = upRow[j - 1];
-            area[1] = upRow[j];
-            area[2] = upRow[j + 1];
-            
+            //area[0] = upRow[j - 1];
+            //area[1] = upRow[j];
+            //area[2] = upRow[j + 1];
+            SIMDPixelPosition(area, {0, 1, 2}, upRow, j);
+
             // Middle row
-            area[3] = centerRow[j - 1];
-            area[4] = centerRow[j];
-            area[5] = centerRow[j + 1];
+            //area[3] = centerRow[j - 1];
+            //area[4] = centerRow[j];
+            //area[5] = centerRow[j + 1];
+            SIMDPixelPosition(area, {3, 4, 5}, centerRow, j);
             
             // Below row
-            area[6] = belowRow[j - 1];
-            area[7] = belowRow[j];
-            area[8] = belowRow[j + 1];
+            //area[6] = belowRow[j - 1];
+            //area[7] = belowRow[j];
+            //area[8] = belowRow[j + 1];
+            SIMDPixelPosition(area, {6, 7, 8}, belowRow, j);
 
             // Get median
             std::sort(area.begin(), area.end());
             outRow[j] = area[4];
         }
     }
+}
+
+void SIMDPixelPosition(std::vector<uchar> &area, std::initializer_list<int> ranges, uchar* _row, int j)
+{
+    area[*ranges.begin()] = _row[j - 1];
+    area[*ranges.begin()+1] = _row[j];
+    area[*ranges.end()] = _row[j + 1];
 }
 
 /**

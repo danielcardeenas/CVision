@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 include_directories(../libs)
 
 set(SOURCE_FILES main.cpp)
-#SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${objects_SOURCE_DIR})
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${objects_SOURCE_DIR})
 
 set(LIB_FILES
     ../libs/Filters.cpp 
