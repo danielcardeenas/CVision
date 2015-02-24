@@ -1,5 +1,6 @@
 #include <iostream>
 #include <math.h> 
+#include <map>
 
 #include "Utils.h"
 #include "Filters.h"
@@ -117,89 +118,51 @@ void MedianFilter(cv::Mat& img, cv::Mat& out_img)
 
 void MedianFilterGray(cv::Mat& img, cv::Mat& out_img)
 {
-    cv::Mat median = cv::Mat::zeros(img.size(), img.type());
+    if (img.channels() != 1) { std::cerr << "Image not supported" << std:: endl; return; }
+    
+    int nRows = img.rows;
+    int nCols = img.cols;
+    
+    // 3x3 vector. Neighbordhood area
+    std::vector<std::vector<uchar>> area(3, std::vector<uchar>(3));
 
-    uchar g;
-    int x = 0;
-    Neighborhood directNeigh;
-
-    uchar* pixel_r1;
-    uchar* pixel_r2;
-    uchar* pixel_r3;
-
-    for (int i = 1; i < img.rows -1; ++i)
+    if (img.isContinuous())
     {
-        pixel_r1 = img.ptr<uchar>(i-1); // point to first pixel in row
-        pixel_r2 = img.ptr<uchar>(i); // point to first pixel in row
-        pixel_r3 = img.ptr<uchar>(i+1); // point to first pixel in row
-        for (int j = 1; j < img.cols -1; ++j)
-        {
-            // (0,0)
-            g = pixel_r1[j-1];
-            directNeigh.push(g, x);
-            x++;
-
-            // (0,1)
-            g = pixel_r1[j];
-            directNeigh.push(g, x);
-            x++;
-
-            // (0,2)
-            g = pixel_r1[j+1];
-            directNeigh.push(g, x);
-            x++;
-
-            // (1,0)
-            g = pixel_r2[j-1];
-            directNeigh.push(g, x);
-            x++;
-
-            // (1,1)
-            g = pixel_r2[j];
-            directNeigh.push(g, x);
-            x++;
-
-            // (1,2)
-            g = pixel_r2[j+1];
-            directNeigh.push(g, x);
-            x++;
-
-            // (2,0)
-            g = pixel_r3[j-1];
-            directNeigh.push(g, x);
-            x++;
-
-            // (2,1)
-            g = pixel_r3[j];
-            directNeigh.push(g, x);
-            x++;
-
-            // (2,2)
-            g = pixel_r3[j+1];
-            directNeigh.push(g, x);
-            x = 0;
-
-
-            // Get median from the neighborhood
-            pix.resize(9);
-            for(int z = 0; z < 9; z++)
-                pix.at(z) = directNeigh.gray_neighborhood[z];
-
-            // Find the median value in the vector and set it to an iterator
-            it = find(pix.begin(), pix.end(), Median(pix));
-            auto index = std::distance(pix.begin(), it);
-            median.at<uchar>(i, j) = directNeigh.gray_neighborhood[index];
-
-            pix.clear();
-            field.clear();
-
-        }
+        nCols *= nRows;
+        nRows = 1;
     }
 
-    cv::imshow("Median", median);
-    cv::waitKey(-1);
-    out_img = median;
-    median.release();
+    int i,j;
+    uchar* upRow;
+    uchar* centerRow;
+    uchar* belowRow;
+    for( i = 1; i < nRows - 1; ++i)
+    {
+        upRow = img.ptr<uchar>(i-1);
+        centerRow = img.ptr<uchar>(i);
+        belowRow = img.ptr<uchar>(i+1);
+        for ( j = 1; j < nCols - 1; ++j)
+        {
+            /// Get neighbordhood
+            
+            // Above row
+            area[0][0] = upRow[j - 1];
+            area[0][1] = upRow[j];
+            area[0][2] = upRow[j + 1];
+            
+            // Middle row
+            area[1][0] = centerRow[j - 1];
+            area[1][1] = centerRow[j];
+            area[1][2] = centerRow[j + 1];
+            
+            // Below row
+            area[2][0] = belowRow[j - 1];
+            area[2][1] = belowRow[j];
+            area[2][2] = belowRow[j + 1];
+            
+            centerRow[j] = MedianFromROI(area);
+        }
+    }
 }
 
 /**
