@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stack>
 #include <set>
+#include <map>
 
 #include "Utils.h"
 #include "Coordinate.h"
@@ -436,6 +437,52 @@ bool FindItem(std::vector<T>& mySet, Coordinate item)
 {
     bool found = (std::find(mySet.begin(), mySet.end(), item) != mySet.end());
     return found;
+}
+
+uchar MedianFromROI(std::vector<std::vector<uchar> > &I)
+{
+    int median;
+    int n;
+    std::map<uchar, int> hist = CalcROIHistogram(I);
+    
+    for(std::map<uchar,int>::iterator ii = hist.begin(); ii != hist.end(); ++ii)
+        n += ii->second;
+        
+    /// Formula of getting median from histogram:
+    /// m = (n+1)/2
+    median = (n + 1) / 2;
+     
+    int temp = 0;   
+    for(std::map<uchar,int>::iterator ii = hist.begin(); ii != hist.end(); ++ii)
+    {
+        if (ii->second + temp >= median)
+            return ii->first;
+        else
+            temp += ii -> second;
+    }
+    
+    return median;
+}
+
+/// Get histogram from grayscale
+std::map<uchar, int> CalcROIHistogram(std::vector<std::vector<uchar> > &I)
+{
+    int bins = 256; // number of bins
+	std::map<uchar, int> hist;
+	
+	uchar val;
+	
+	// Calculate the histogram of the ROI
+	for (int i = 0; i < I.size(); i++)
+	{
+		for (int j = 0; j < I[0].size(); j++)
+		{
+			val = I[i][j];
+			hist[val] += 1;
+		}
+	}
+	
+	return hist;
 }
 
 /// 
