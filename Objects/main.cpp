@@ -47,7 +47,7 @@ int main(int argc, char** argv)
     std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " Miliseconds" <<std::endl;
 
     /// Filters.cpp for more info
-    //EuclidianJoin(gradX, gradY, joinImg);
+    EuclidianJoin(gradX, gradY, joinImg);
     // AbsJoin(gradX, gradY, joinImg);
 
     /// Filters.cpp for more info
