@@ -24,4 +24,6 @@ template <typename T> bool FindItem(std::vector<T> &mySet, Coordinate item);
 
 uchar MedianFromROI(std::vector<std::vector<uchar> > &I);
 std::map<uchar, int> CalcROIHistogram(std::vector<std::vector<uchar> > &I);
+
+void DetectLines(cv::Mat inImg, cv::Mat outImg);
 #endif // __UTILS_H_INCLUDED__

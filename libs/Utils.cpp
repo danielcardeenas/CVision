@@ -425,6 +425,39 @@ std::map<uchar, int> CalcROIHistogram(std::vector<std::vector<uchar> > &I)
 	return hist;
 }
 
+void DetectLines(cv::Mat inImg, cv::Mat outImg)
+{
+    int nRows = inImg.rows;
+    int nCols = inImg.cols;
+
+    if (inImg.isContinuous())
+    {
+        nCols *= nRows;
+        nRows = 1;
+    }
+    
+    double theta;
+    int x, y;
+    
+    int i,j;
+    uchar* inRow;
+    uchar* outRow;
+    for( i = 0; i < nRows; ++i)
+    {
+        inRow = inImg.ptr<uchar>(i);
+        outRow = outImg.ptr<uchar>(i);
+        for ( j = 0; j < nCols; ++j)
+        {
+            x = j;
+            y = i;
+            theta = atan2(y, x);
+            r = x*cos(theta) + y * sin(theta);
+            
+            inImg.ptr<uchar>(theta)[r] = 128;
+        }
+    }
+}
+
 /// 
 /// Gets all the direct neighbors of a pixel and sets them into
 /// std::vector<Vec3b> field -> Global variable
