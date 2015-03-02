@@ -38,27 +38,22 @@ int main(int argc, char** argv)
             {-1,0,1}
     });
 
-    /// Filters.cpp for more info
+    ///
+    /// Uncomment this lines if you want to use my functions for pre-processing
+    /// Convolution function is slow
     //Convolution(inImg, gradX, sobx);
     //Convolution(inImg, gradY, soby);
-
-    // Utils.cpp ->
-    //CustomDetectLines(gradX, gradY, colorImg);
-
-    /// Filters.cpp for more info
     //EuclidianJoin(gradX, gradY, joinImg);
-    //AbsJoin(gradX, gradY, joinImg);
 
-    /// Filters.cpp for more info
-    //DeviationThreshold(joinImg, final);
-    //LazyThreshold(joinImg, bin);
-    // MeanThreshold(joinImg, final);
-
+    ///
+    /// Comment this if you're going to use the functions from above.
+    /// Canny is way more fast than two sobel convolutions.
+    /// TODO: Implement Canny detection.
     cv::blur(inImg, joinImg, cv::Size(5,5) );
-    cv::Canny(joinImg, bin, 100, 150, 3);
+    cv::Canny(joinImg, joinImg, 100, 150, 3);
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-    DetectLines(bin, colorImg);
+    DetectLines(joinImg, colorImg, 100);
 
     std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
     std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " Miliseconds" <<std::endl;

@@ -9,6 +9,7 @@
 #include "Filters.h"
 #include "Kernel.h"
 
+/// RAD = 0.017453293f (π / 180). Used to convert to radians
 #define RAD 0.017453293f
 
 std::vector<cv::Vec3b> neighbors;
@@ -485,8 +486,11 @@ void CustomDetectLines(cv::Mat &gradX, cv::Mat &gradY, cv::Mat &outImg)
     }
 }
 
-//Hough Line Transform
-void DetectLines(cv::Mat &inImg, cv::Mat &outImg)
+///
+/// Hough Line Transform
+/// Sets the votes inside an accumulator
+/// Calls the functions that draws the lines
+void DetectLines(cv::Mat &inImg, cv::Mat &outImg, int threshold)
 {
     int imgW = inImg.cols;
     int imgH = inImg.rows;
@@ -507,6 +511,8 @@ void DetectLines(cv::Mat &inImg, cv::Mat &outImg)
     double center_x = imgW/2;
     double center_y = imgH/2;
 
+    double rho;
+
     uchar *inRow;
     for(int y = 0; y < imgH; y++)
     {
@@ -516,43 +522,51 @@ void DetectLines(cv::Mat &inImg, cv::Mat &outImg)
             // If border tocuhed
             if( inImg.data[ (y*imgW) + x] > 250)
             {
+                // Calculate rho from θ = 0° to θ = 179° and vote
                 for(int t = 0; t < 180; t++)
                 {
-                    // rho = x.cos(θ) + y.sin(θ)
-                    double r = (((double)x - center_x) * cos((double)t * RAD)) + (((double)y - center_y) * sin((double)t * RAD));
-                    accu[ (int)((round(r + hough_h) * 180.0)) + t]++;
+                    ///
+                    /// Use polar coordinates
+                    /// RAD = 0.017453293f (π / 180). Used to convert to radians
+                    /// rho = x.cos(θ) + y.sin(θ)
+                    rho = (((double)x - center_x) * cos((double)t * RAD)) + (((double)y - center_y) * sin((double)t * RAD));
+
+                    // Add a vote
+                    accu[ (int)((round(rho + hough_h) * 180.0)) + t]++;
                 }
             }
         }
     }
 
     //auto threshold: imgW > imgH? imgW/4: imgH/4
-    int threshold = 100;
     std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> lines = GetLines(threshold, accu, accu_h, accu_w, imgH, imgW);
     DrawLines(lines, outImg);
 }
 
+///
+/// Returns a vector with pairs of coordinates:
+/// [(x1, y1), (x2, y2)]
+/// Only lines with good votes are selected (threshold)
 std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> GetLines(int threshold, unsigned int * &accu, int accu_h, int accu_w, int imgH, int imgW)
 {
     std::vector< std::pair< std::pair<int, int>, std::pair<int, int> > > lines;
     if(accu == 0)
         return lines;
 
-    for(int r = 0; r <accu_h ; r++)
+    for(int r = 0; r < accu_h ; r++)
     {
         for(int t = 0; t < accu_w; t++)
         {
             if((int)accu[(r*accu_w) + t] >= threshold)
             {
-                //Is this point a local maxima (9x9)
                 int max = accu[(r*accu_w) + t];
                 for(int ly= -4; ly <= 4; ly++)
                 {
                     for(int lx = -4; lx <= 4; lx++)
                     {
-                        if( (ly+r>=0 && ly+r<accu_h) && (lx+t>=0 && lx+t<accu_w)  )
+                        if((ly + r >= 0 && ly + r < accu_h) && (lx + t >= 0 && lx + t < accu_w))
                         {
-                            if( (int)accu[( (r+ly)*accu_w) + (t+lx)] > max )
+                            if((int)accu[((r+ly)*accu_w) + (t+lx)] > max)
                             {
                                 max = accu[( (r+ly)*accu_w) + (t+lx)];
                                 ly = lx = 5;
@@ -595,17 +609,24 @@ std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> GetLines(int th
     return lines;
 }
 
+///
+/// Draw lines in img
 void DrawLines(std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> &lines, cv::Mat &outImg)
 {
     int id = 0;
+    double m = 0;
+    double y = 0;
     cv::RNG rng(98342);
     std::vector< std::pair< std::pair<int, int>, std::pair<int, int> > >::iterator it;
     for(it = lines.begin(); it != lines.end(); it++)
     {
+        // Draw line
         cv::line(outImg, cv::Point(it->first.first, it->first.second), cv::Point(it->second.first, it->second.second),
                 cv::Scalar(rng.uniform(0,255), rng.uniform(0, 255), rng.uniform(0, 255)), 2, 8);
 
-        std::cout << "Line " << id << std::endl;
+        m = (it->second.second - it->first.second) / (it->second.first - it->first.first);
+        std::cout << "Line " << id << ":\ny = " << "m" << "x + " << it->first.second << std::endl;
+        id++;
     }
 }
 
