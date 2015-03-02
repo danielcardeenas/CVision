@@ -15,6 +15,26 @@ $ make
 ```sh
 $ ./lines <img_to_use.jpg>
 ```
+#####Outputs
+
+```sh
+> lines: 25 100
+> Line 0:
+> y = mx + -167
+> Line 1:
+> y = mx + 374
+...
+> Time elapsed: 300 Miliseconds
+
+```
+
+
+**lines:** [number of lines detected] [threshold used]
+
+**Line** [line id]: <line equiation>
+
+**Time elapsed:** [Miliseconds]
+
 ### Explanation
 
 ### Samples
