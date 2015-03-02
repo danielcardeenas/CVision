@@ -4,6 +4,7 @@ Dependencies of these tools:
 
 + **OpenCV**
 + **CMake**
++ **GCC / Clang**
 
 ##Class
 The class assignments will be in the root of the repo categrized by subdirectories
