@@ -31,11 +31,22 @@ $ ./lines <img_to_use.jpg>
 
 **lines:** [number of lines detected] [threshold used]
 
-**Line** [line id]: <line equiation>
+**Line** [line id]: [line equation]
 
 **Time elapsed:** [Miliseconds]
 
 ### Explanation
+
+---------------------------------------
+
+######NOTE:
+Currently uses **opencv** library functinos for pre-processing:
++ Blur (remove noise).
++ Canny (border detection).
+
+Altough my own pre-processing funcitons produce almost exactly the same output, they took way more time than opencv ones (**mine:** *~2500 milliseconds*, **opencv:** *~7 milliseconds*). Anyways you can just uncomment my functions from `main.cpp` and comment opencv if testing is desired.
+
+---------------------------------------
 
 ### Samples
 #####Threshold: 100 votes
