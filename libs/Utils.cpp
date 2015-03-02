@@ -527,7 +527,7 @@ void DetectLines(cv::Mat &inImg, cv::Mat &outImg)
     }
 
     //auto threshold: imgW > imgH? imgW/4: imgH/4
-    int threshold = 450;
+    int threshold = 100;
     std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> lines = GetLines(threshold, accu, accu_h, accu_w, imgH, imgW);
     DrawLines(lines, outImg);
 }
@@ -597,10 +597,15 @@ std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> GetLines(int th
 
 void DrawLines(std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> &lines, cv::Mat &outImg)
 {
+    int id = 0;
+    cv::RNG rng(98342);
     std::vector< std::pair< std::pair<int, int>, std::pair<int, int> > >::iterator it;
     for(it = lines.begin(); it != lines.end(); it++)
     {
-        cv::line(outImg, cv::Point(it->first.first, it->first.second), cv::Point(it->second.first, it->second.second), cv::Scalar( 0, 0, 255), 2, 8);
+        cv::line(outImg, cv::Point(it->first.first, it->first.second), cv::Point(it->second.first, it->second.second),
+                cv::Scalar(rng.uniform(0,255), rng.uniform(0, 255), rng.uniform(0, 255)), 2, 8);
+
+        std::cout << "Line " << id << std::endl;
     }
 }
 

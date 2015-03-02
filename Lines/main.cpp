@@ -39,25 +39,28 @@ int main(int argc, char** argv)
     });
 
     /// Filters.cpp for more info
-    Convolution(inImg, gradX, sobx);
-    Convolution(inImg, gradY, soby);
+    //Convolution(inImg, gradX, sobx);
+    //Convolution(inImg, gradY, soby);
 
     // Utils.cpp ->
     //CustomDetectLines(gradX, gradY, colorImg);
 
     /// Filters.cpp for more info
-    EuclidianJoin(gradX, gradY, joinImg);
+    //EuclidianJoin(gradX, gradY, joinImg);
     //AbsJoin(gradX, gradY, joinImg);
 
     /// Filters.cpp for more info
     //DeviationThreshold(joinImg, final);
-    LazyThreshold(joinImg, bin);
+    //LazyThreshold(joinImg, bin);
     // MeanThreshold(joinImg, final);
+
+    cv::blur(inImg, joinImg, cv::Size(5,5) );
+    cv::Canny(joinImg, bin, 100, 150, 3);
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     DetectLines(bin, colorImg);
 
     std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
     std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " Miliseconds" <<std::endl;
-    imwrite("final.jpg", colorImg);
+    imwrite("chess_100.jpg", colorImg);
 }
