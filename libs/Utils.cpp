@@ -510,11 +510,11 @@ void DetectLines(cv::Mat &inImg, cv::Mat &outImg)
     uchar *inRow;
     for(int y = 0; y < imgH; y++)
     {
-        inRow = inImg.ptr<uchar>(y);
+        //inRow = inImg.ptr<uchar>(y);
         for(int x = 0; x < imgW; x++)
         {
             // If border tocuhed
-            if( inRow[y] > 250 )
+            if( inImg.data[ (y*imgW) + x] > 250)
             {
                 for(int t = 0; t < 180; t++)
                 {
@@ -526,7 +526,9 @@ void DetectLines(cv::Mat &inImg, cv::Mat &outImg)
         }
     }
 
-    std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> lines = GetLines(imgW > imgH? imgW/4: imgH/4, accu, accu_h, accu_w, imgH, imgW);
+    //auto threshold: imgW > imgH? imgW/4: imgH/4
+    int threshold = 450;
+    std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> lines = GetLines(threshold, accu, accu_h, accu_w, imgH, imgW);
     DrawLines(lines, outImg);
 }
 

@@ -42,12 +42,6 @@ int main(int argc, char** argv)
     Convolution(inImg, gradX, sobx);
     Convolution(inImg, gradY, soby);
 
-    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-    CustomDetectLines(gradX, gradY, colorImg);
-
-    std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
-    std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " Miliseconds" <<std::endl;
-
     // Utils.cpp ->
     //CustomDetectLines(gradX, gradY, colorImg);
 
@@ -60,5 +54,10 @@ int main(int argc, char** argv)
     LazyThreshold(joinImg, bin);
     // MeanThreshold(joinImg, final);
 
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    DetectLines(bin, colorImg);
+
+    std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
+    std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " Miliseconds" <<std::endl;
     imwrite("final.jpg", colorImg);
 }
