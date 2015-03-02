@@ -9,8 +9,6 @@
 #include "Filters.h"
 #include "Kernel.h"
 
-#define RAD 0.017453293f
-
 std::vector<cv::Vec3b> neighbors;
 
 /// Gets the standard deviation value of an image
@@ -488,118 +486,70 @@ void CustomDetectLines(cv::Mat &gradX, cv::Mat &gradY, cv::Mat &outImg)
 //Hough Line Transform
 void DetectLines(cv::Mat &inImg, cv::Mat &outImg)
 {
-    int imgW = inImg.cols;
-    int imgH = inImg.rows;
+    int nRows = inImg.rows;
+    int nCols = inImg.cols;
 
-    ///
-    /// Accumulator -> Memory block cause yolo
-    /// Hough Space:
-    ///     accu_h = height of accumulator (from -rho -> 0 -> +rho)
-    ///     accu_w = width of accumulator (theta)
-    unsigned int* accu;
-    double hough_h = ((sqrt(2.0) * (double)(imgH > imgW?imgH: imgW)) / 2.0);
-    int accu_h = hough_h * 2.0; // -rho -> +rho
-    int accu_w = 180;
-    accu = (unsigned int*)calloc(accu_h * accu_w, sizeof(unsigned int));
+    double theta, rho;
+    int x, y;
 
-    /// Center of the img
-    /// Used to work with polar coordinates
-    double center_x = imgW/2;
-    double center_y = imgH/2;
+    uchar border = 255;
+    cv::Vec3b marker;
+    marker[0] = 0;
+    marker[1] = 255;
+    marker[2] = 0;
 
-    uchar *inRow;
-    for(int y = 0; y < imgH; y++)
+    cv::Vec3b markerBlue;
+    markerBlue[0] = 0;
+    markerBlue[1] = 255;
+    markerBlue[2] = 255;
+
+    // Accumulator
+    std::map<std::pair<double, double>, int> accumulator;
+
+    int i,j;
+    uchar* xRow;
+    cv::Vec3b* colorRow;
+    for( i = 0; i < nRows; ++i)
     {
-        inRow = inImg.ptr<uchar>(y);
-        for(int x = 0; x < imgW; x++)
+        xRow = inImg.ptr<uchar>(i);
+        colorRow = outImg.ptr<cv::Vec3b>(i);
+        for ( j = 0; j < nCols; ++j)
         {
-            // If border tocuhed
-            if( inRow[y] > 250 )
+            if(xRow[j] == border)
             {
-                for(int t = 0; t < 180; t++)
+                x = j;
+                y = i;
+
+                for(theta = 0; theta < 180; ++theta)
                 {
-                    // rho = x.cos(θ) + y.sin(θ)
-                    double r = (((double)x - center_x) * cos((double)t * RAD)) + (((double)y - center_y) * sin((double)t * RAD));
-                    accu[ (int)((round(r + hough_h) * 180.0)) + t]++;
-                }
+                    rho = (x*cos(theta)) + (y * sin(theta));
+
+                    // Vote por (theta, rho) coordenate in accumulator
+                    accumulator[{theta, round(rho)}] += 1;
+                };
+
+                //cv::imshow("tim", outImg);
+                //cv::waitKey(1);
             }
         }
     }
 
-    std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> lines = GetLines(imgW > imgH? imgW/4: imgH/4, accu, accu_h, accu_w, imgH, imgW);
-    DrawLines(lines, outImg);
-}
-
-std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> GetLines(int threshold, unsigned int * &accu, int accu_h, int accu_w, int imgH, int imgW)
-{
-    std::vector< std::pair< std::pair<int, int>, std::pair<int, int> > > lines;
-    if(accu == 0)
-        return lines;
-
-    for(int r = 0; r <accu_h ; r++)
-    {
-        for(int t = 0; t < accu_w; t++)
-        {
-            if((int)accu[(r*accu_w) + t] >= threshold)
-            {
-                //Is this point a local maxima (9x9)
-                int max = accu[(r*accu_w) + t];
-                for(int ly= -4; ly <= 4; ly++)
-                {
-                    for(int lx = -4; lx <= 4; lx++)
-                    {
-                        if( (ly+r>=0 && ly+r<accu_h) && (lx+t>=0 && lx+t<accu_w)  )
-                        {
-                            if( (int)accu[( (r+ly)*accu_w) + (t+lx)] > max )
-                            {
-                                max = accu[( (r+ly)*accu_w) + (t+lx)];
-                                ly = lx = 5;
-                            }
-                        }
-                    }
-                }
-                if(max > (int)accu[(r*accu_w) + t])
-                    continue;
-
-
-                int x1, y1, x2, y2;
-                x1 = y1 = x2 = y2 = 0;
-
-                if(t >= 45 && t <= 135)
-                {
-                    //y = (r - x cos(t)) / sin(t)
-                    x1 = 0;
-                    y1 = ((double)(r-(accu_h/2)) - ((x1 - (imgW/2) ) * cos(t * RAD))) / sin(t * RAD) + (imgH / 2);
-                    x2 = imgW - 0;
-                    y2 = ((double)(r-(accu_h/2)) - ((x2 - (imgW/2) ) * cos(t * RAD))) / sin(t * RAD) + (imgH / 2);
-                }
-                else
-                {
-                    //x = (r - y sin(t)) / cos(t);
-                    y1 = 0;
-                    x1 = ((double)(r-(accu_h/2)) - ((y1 - (imgH/2) ) * sin(t * RAD))) / cos(t * RAD) + (imgW / 2);
-                    y2 = imgH - 0;
-                    x2 = ((double)(r-(accu_h/2)) - ((y2 - (imgH/2) ) * sin(t * RAD))) / cos(t * RAD) + (imgW / 2);
-                }
-
-                lines.push_back(std::pair< std::pair<int, int>, std::pair<int, int> >(std::pair<int, int>(x1,y1), std::pair<int, int>(x2,y2)));
-
-            }
-        }
+    // Print accumulator
+/*
+    for (std::map<std::pair<double, double>, int>::iterator ii = accumulator.begin(), e = accumulator.end(); ii != e; ii++) {
+        std::cout << ii->first.first << " _ " << ii->first.second << ": " << ii->second << std::endl;
     }
+*/
 
-    std::cout << "lines: " << lines.size() << " " << threshold << std::endl;
-    free(accu);
-    return lines;
-}
+    std::vector<std::pair<std::pair<double, double>, int> > top_four(4);
+    std::partial_sort_copy(mymap.begin(),
+                       top_four.end(),
+                       [](std::pair<const std::string, int> const& l,
+                          std::pair<const std::string, int> const& r)
+                       {
+                           return l.second > r.second;
+                       });
 
-void DrawLines(std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> &lines, cv::Mat &outImg)
-{
-    std::vector< std::pair< std::pair<int, int>, std::pair<int, int> > >::iterator it;
-    for(it = lines.begin(); it != lines.end(); it++)
-    {
-        cv::line(outImg, cv::Point(it->first.first, it->first.second), cv::Point(it->second.first, it->second.second), cv::Scalar( 0, 0, 255), 2, 8);
-    }
 }
 
 ///

@@ -38,27 +38,27 @@ int main(int argc, char** argv)
             {-1,0,1}
     });
 
-    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     /// Filters.cpp for more info
     Convolution(inImg, gradX, sobx);
     Convolution(inImg, gradY, soby);
 
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    CustomDetectLines(gradX, gradY, colorImg);
+
     std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
     std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " Miliseconds" <<std::endl;
 
+    // Utils.cpp ->
+    //CustomDetectLines(gradX, gradY, colorImg);
+
     /// Filters.cpp for more info
     EuclidianJoin(gradX, gradY, joinImg);
-    // AbsJoin(gradX, gradY, joinImg);
+    //AbsJoin(gradX, gradY, joinImg);
 
     /// Filters.cpp for more info
     //DeviationThreshold(joinImg, final);
     LazyThreshold(joinImg, bin);
     // MeanThreshold(joinImg, final);
 
-
-    // Utils.cpp ->
-    DetectLines();
-
     imwrite("final.jpg", colorImg);
-    //waitKey(-1);
 }
