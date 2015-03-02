@@ -547,6 +547,7 @@ void DetectLines(cv::Mat &inImg, cv::Mat &outImg, int threshold)
 /// Returns a vector with pairs of coordinates:
 /// [(x1, y1), (x2, y2)]
 /// Only lines with good votes are selected (threshold)
+/// TODO: Make a Class for Line instead of returning this pairs inside a pair inside a vector
 std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> GetLines(int threshold, unsigned int * &accu, int accu_h, int accu_w, int imgH, int imgW)
 {
     std::vector< std::pair< std::pair<int, int>, std::pair<int, int> > > lines;
