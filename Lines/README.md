@@ -18,11 +18,15 @@ $ ./lines <img_to_use.jpg>
 ### Explanation
 
 ### Samples
+#####Threshold: 100 votes
+
 **Input**: ```img/chessboard1.png```
 **Outputs**: ```chess_100.jpg```
 
 <img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Lines/img/chessboard1.png" width="320" height="240" />
 <img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Lines/chess_100.jpg" width="320" height="240" />
+
+#####Threshold: 200 votes
 
 **Input**: ```img/chessboard1.png```
 **Outputs**: ```chess_200.jpg```
