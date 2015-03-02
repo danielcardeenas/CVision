@@ -48,7 +48,7 @@ Altough my own pre-processing funcitons produce almost exactly the same output, 
 
 ---------------------------------------
 
-1.  Inside `main.cpp` calls [`DetectLines()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L493), receives the threshold votes in the third arg. (If none given, default = 100). This functions creates a block of memory for an array and initializes all its bits to zero (This wil act as an accumulator). For each border touched it will compute `ρ = x.cosθ + y.sinθ` from θ = 0° to θ = 179° and vote for each `(ρ, θ)` in the accumulator (`accu`).
+1.  Inside `main.cpp` calls [`DetectLines()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L493), receives the threshold votes in the third arg. `If not specified, default = 100`. This functions creates a block of memory for an array and initializes all its bits to zero (This wil act as an accumulator). For each border touched it will compute `ρ = x.cosθ + y.sinθ` from θ = 0° to θ = 179° and vote for each `(ρ, θ)` in the accumulator (`accu`).
 2.  Then [`GetLines()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L551) gets the "most-voted" lines from the accumulator and puts them back into original coordinates by solving `x = (ρ - y.sinθ)/cosθ` and `y = (ρ - x.cosθ)/sinθ`. Once finished it will free the accumulator, no worries.
 3.  After that [`DrawLines()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L615) just draw the lines computed from `GetLines()` in the original image.
 
