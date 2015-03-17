@@ -67,7 +67,16 @@ The function can work without giving any parameters at all, the program can choo
 #####Threshold: Auto
 
 **Input**: ```img/pool6.jpg```
-**Outputs**: ```billar90.jpg```
+**Outputs**: ```poolAuto.jpg```
 
 <img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Circles/img/pool6.jpg" width="320" height="240" />
 <img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Circles/poolAuto.jpg" width="320" height="240" />
+
+#####Threshold: Auto vs 56
+
+**Input**: ```img/mike.jpg```
+**Outputs**: ```mikeAuto.jpg``` - ```mike56.jpg```
+
+<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Circles/img/mike.jpg" width="320" height="240" />
+<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Circles/mikeAuto.jpg" width="200" height="160" />
+<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Circles/mike56.jpg" width="200" height="160" />
