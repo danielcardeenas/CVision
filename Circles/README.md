@@ -22,7 +22,7 @@ $ ./circles <img_to_use.jpg> <[int]threshold (optional)>
 > (260, 144)
 > (317, 420)
 ...
-> Time elapsed: 5038 Miliseconds
+> Time elapsed: 3038 Miliseconds
 
 ```
 
@@ -42,9 +42,9 @@ $ ./circles <img_to_use.jpg> <[int]threshold (optional)>
 ######NOTE:
 The function can work without giving any parameters at all, the program can choose their values by [itself](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L672).
 
-2.  Then for each radius value [`HoughCircleTransform()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L789) takes charge of filling the accumulator with votes (posible centers of circles) using `x₀ = x - R * cos(θ)` and `y₀ = y - R * sin(θ)`.
-3.  In the same iteration [`GetCircles()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L830) decides wether or not the votes in the accumulator are centers of circles.
-4.  [`~Draw()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L730), here just draws the circles giving its center coordinate and radius. (Sorry for the sleepy code here, this should be inside a method).
+2.  Then for each radius value [`HoughCircleTransform()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L763) takes charge of filling the accumulator with votes (posible centers of circles) using `x₀ = x - R * cos(θ)` and `y₀ = y - R * sin(θ)`.
+3.  In the same iteration [`GetCircles()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L804) decides wether or not the votes in the accumulator are centers of circles.
+4.  [`~Draw()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L705), here just draws the circles giving its center coordinate and radius. (Sorry for the sleepy code here, this should be inside a method).
 
 ### Samples
 
