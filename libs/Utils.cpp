@@ -674,33 +674,8 @@ void DetectCircles(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadius
         //Search the accumulator
         GetCircles(threshold, circles, r, _accu, accuH, accuW);
 
-        //Draw the results
-        int maxa = 0;
-
-        for (int p = 0; p < (accuH * accuW); ++p)
-        {
-            if ((int) _accu[p] > maxa)
-                maxa = _accu[p];
-        }
-
-        double contrast = 1.0;
-        double coef = 255.0 / (double)maxa * contrast;
-
-        // Visualize accumulator graphic
-        /*
-        cv::Mat accuGraph(accuH, accuW, CV_8UC3);
-        for(int p = 0; p < (accuH * accuW); ++p)
-        {
-            unsigned char c = (double)accu[p] * coef < 255.0 ? (double)accu[p] * coef : 255.0;
-            accuGraph.data[(p*3)+0] = 255;
-            accuGraph.data[(p*3)+1] = 255-c;
-            accuGraph.data[(p*3)+2] = 255-c;
-        }
-        */
-
-
         cv::imshow("out", inImg);
-        //cv::imshow(CW_ACCUMULATOR, accuGraph);
+        //cv::imshow("accu", accuGraph);
 
         cv::waitKey(1);
 
@@ -745,8 +720,8 @@ void DetectCircles(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadius
 
         std::cout <<"(" << it->first.first << ", " << it->first.second << ")" << std::endl;
 
-        // Draw radius
-        /*
+        // Draw radius line and text.
+        // Might want to comment if the image is too small
         cv::line(outImg,
                 cv::Point(it->first.first, it->first.second),
                 cv::Point(it->first.first + it->second, it->first.second),
@@ -761,11 +736,10 @@ void DetectCircles(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadius
                 cv::Point(it->first.first + 6, it->first.second - 6),
                 CV_FONT_HERSHEY_PLAIN,
                 .6,
-                cv::Scalar(0, 0, 0),
+                cv::Scalar(255, 255, 255),
                 1,
                 8,
                 false);
-        */
 
         // Draw circle
         cv::circle(outImg,
@@ -780,8 +754,8 @@ void DetectCircles(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadius
     free(_accu);
 
     std::cout << "Finished" << std::endl;
-    cv::imshow("out", outImg);
-    cv::waitKey(360000);
+    //cv::imshow("out", outImg);
+    //cv::waitKey(360000);
 }
 
 ///
