@@ -72,7 +72,7 @@ The function can work without giving any parameters at all, the program can choo
 <img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Circles/img/pool6.jpg" width="320" height="240" />
 <img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Circles/poolAuto.jpg" width="320" height="240" />
 
-#####Threshold: Auto vs 56
+#####Threshold: Auto
 
 **Input**: ```img/mike.jpg```
 **Outputs**: ```mikeAuto.jpg```
