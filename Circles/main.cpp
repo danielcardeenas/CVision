@@ -19,10 +19,10 @@ int main(int argc, char** argv)
     //waitKey(-1);
 
     cv::Mat joinImg = cv::Mat::zeros(inImg.size(), inImg.type());
-    cv::Mat imgAbs = cv::Mat::zeros(inImg.size(), inImg.type());
-    cv::Mat gradY = cv::Mat::zeros(inImg.size(), inImg.type());
-    cv::Mat gradX = cv::Mat::zeros(inImg.size(), inImg.type());
-    cv::Mat bin = cv::Mat::zeros(inImg.size(), inImg.type());
+    //cv::Mat imgAbs = cv::Mat::zeros(inImg.size(), inImg.type());
+    //cv::Mat gradY = cv::Mat::zeros(inImg.size(), inImg.type());
+    //cv::Mat gradX = cv::Mat::zeros(inImg.size(), inImg.type());
+    //cv::Mat bin = cv::Mat::zeros(inImg.size(), inImg.type());
 
     // Supports n*n size
     /// As long it's odd sized and squared

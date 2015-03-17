@@ -734,6 +734,7 @@ void DetectCircles(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadius
         cv::Point center(it->first.first,
                          it->first.second);
 
+        // Draw center
         cv::circle(outImg,
                 center,
                 3,
@@ -744,11 +745,34 @@ void DetectCircles(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadius
 
         std::cout <<"(" << it->first.first << ", " << it->first.second << ")" << std::endl;
 
+        // Draw radius
+        /*
+        cv::line(outImg,
+                cv::Point(it->first.first, it->first.second),
+                cv::Point(it->first.first + it->second, it->first.second),
+                cv::Scalar(255, 255, 255),
+                1,
+                8);
+
+
+        std::string text = "r: " + std::to_string(it->second);
+        cv::putText(outImg,
+                text,
+                cv::Point(it->first.first + 6, it->first.second - 6),
+                CV_FONT_HERSHEY_PLAIN,
+                .6,
+                cv::Scalar(0, 0, 0),
+                1,
+                8,
+                false);
+        */
+
+        // Draw circle
         cv::circle(outImg,
                 cv::Point(it->first.first, it->first.second),
                 it->second,
-                cv::Scalar(0,0,255),
-                2,
+                cv::Scalar(0, 176, 255),
+                3,
                 8);
     }
 
