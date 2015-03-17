@@ -498,13 +498,13 @@ void DetectLines(cv::Mat &inImg, cv::Mat &outImg, int threshold)
     ///
     /// Accumulator -> Memory block cause yolo
     /// Hough Space:
-    ///     accu_h = height of accumulator (from -rho -> 0 -> +rho)
-    ///     accu_w = width of accumulator (theta)
+    ///     accuH = height of accumulator (from -rho -> 0 -> +rho)
+    ///     accuW = width of accumulator (theta)
     unsigned int* accu;
     double hough_h = ((sqrt(2.0) * (double)(imgH > imgW?imgH: imgW)) / 2.0);
-    int accu_h = hough_h * 2.0; // -rho -> +rho
-    int accu_w = 180;
-    accu = (unsigned int*)calloc(accu_h * accu_w, sizeof(unsigned int));
+    int accuH = hough_h * 2.0; // -rho -> +rho
+    int accuW = 180; // 0° -> 179°
+    accu = (unsigned int*)calloc(accuH * accuW, sizeof(unsigned int));
 
     /// Center of the img
     /// Used to work with polar coordinates
@@ -539,43 +539,43 @@ void DetectLines(cv::Mat &inImg, cv::Mat &outImg, int threshold)
     }
 
     //auto threshold: imgW > imgH? imgW/4: imgH/4
-    std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> lines = GetLines(threshold, accu, accu_h, accu_w, imgH, imgW);
+    std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> lines = GetLines(threshold, accu, accuH, accuW, imgH, imgW);
     DrawLines(lines, outImg);
 }
 
 ///
 /// Returns a vector with pairs of coordinates:
 /// [(x1, y1), (x2, y2)]
-/// Only lines with good votes are selected (threshold)
+/// Only lines with an amount of votes above the threshold are selected
 /// TODO: Make a Class for Line instead of returning this pairs inside a pair inside a vector
-std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> GetLines(int threshold, unsigned int * &accu, int accu_h, int accu_w, int imgH, int imgW)
+std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> GetLines(int threshold, unsigned int * &accu, int accuH, int accuW, int imgH, int imgW)
 {
     std::vector< std::pair< std::pair<int, int>, std::pair<int, int> > > lines;
     if(accu == 0)
         return lines;
 
-    for(int r = 0; r < accu_h ; r++)
+    for(int r = 0; r < accuH ; r++)
     {
-        for(int t = 0; t < accu_w; t++)
+        for(int t = 0; t < accuW; t++)
         {
-            if((int)accu[(r*accu_w) + t] >= threshold)
+            if((int)accu[(r*accuW) + t] >= threshold)
             {
-                int max = accu[(r*accu_w) + t];
+                int max = accu[(r*accuW) + t];
                 for(int ly= -4; ly <= 4; ly++)
                 {
                     for(int lx = -4; lx <= 4; lx++)
                     {
-                        if((ly + r >= 0 && ly + r < accu_h) && (lx + t >= 0 && lx + t < accu_w))
+                        if((ly + r >= 0 && ly + r < accuH) && (lx + t >= 0 && lx + t < accuW))
                         {
-                            if((int)accu[((r+ly)*accu_w) + (t+lx)] > max)
+                            if((int)accu[((r+ly)*accuW) + (t+lx)] > max)
                             {
-                                max = accu[( (r+ly)*accu_w) + (t+lx)];
+                                max = accu[( (r+ly)*accuW) + (t+lx)];
                                 ly = lx = 5;
                             }
                         }
                     }
                 }
-                if(max > (int)accu[(r*accu_w) + t])
+                if(max > (int)accu[(r*accuW) + t])
                     continue;
 
 
@@ -586,17 +586,17 @@ std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> GetLines(int th
                 {
                     //y = (r - x cos(t)) / sin(t)
                     x1 = 0;
-                    y1 = ((double)(r-(accu_h/2)) - ((x1 - (imgW/2) ) * cos(t * RAD))) / sin(t * RAD) + (imgH / 2);
+                    y1 = ((double)(r-(accuH/2)) - ((x1 - (imgW/2) ) * cos(t * RAD))) / sin(t * RAD) + (imgH / 2);
                     x2 = imgW - 0;
-                    y2 = ((double)(r-(accu_h/2)) - ((x2 - (imgW/2) ) * cos(t * RAD))) / sin(t * RAD) + (imgH / 2);
+                    y2 = ((double)(r-(accuH/2)) - ((x2 - (imgW/2) ) * cos(t * RAD))) / sin(t * RAD) + (imgH / 2);
                 }
                 else
                 {
                     //x = (r - y sin(t)) / cos(t);
                     y1 = 0;
-                    x1 = ((double)(r-(accu_h/2)) - ((y1 - (imgH/2) ) * sin(t * RAD))) / cos(t * RAD) + (imgW / 2);
+                    x1 = ((double)(r-(accuH/2)) - ((y1 - (imgH/2) ) * sin(t * RAD))) / cos(t * RAD) + (imgW / 2);
                     y2 = imgH - 0;
-                    x2 = ((double)(r-(accu_h/2)) - ((y2 - (imgH/2) ) * sin(t * RAD))) / cos(t * RAD) + (imgW / 2);
+                    x2 = ((double)(r-(accuH/2)) - ((y2 - (imgH/2) ) * sin(t * RAD))) / cos(t * RAD) + (imgW / 2);
                 }
 
                 lines.push_back(std::pair< std::pair<int, int>, std::pair<int, int> >(std::pair<int, int>(x1,y1), std::pair<int, int>(x2,y2)));
@@ -628,6 +628,221 @@ void DrawLines(std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> 
         m = (it->second.second - it->first.second) / (it->second.first - it->first.first);
         std::cout << "Line " << id << ":\ny = " << "m" << "x + " << it->first.second << std::endl;
         id++;
+    }
+}
+
+///
+/// Hough Circles Transform
+/// @param:
+///     cv::Mat &inImg: input image
+///      cv::Mat &outImg: output image
+///      int threshold: [auto if not defined]
+///      int minRadius: [20 if not defined],
+///      int maxRadius: [250 if not defined],
+///      int step : [4 if not defined]
+void DetectCircles(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadius, int maxRadius, int step)
+{
+    const int width = inImg.cols;
+    const int height = inImg.rows;
+
+    const int accuH = height;
+    const int accuW = width;
+
+    ///
+    /// Accumulator for votes -> memory block
+    /// Set to nullptr because another function will manage the accumulator (free and fill)
+    /// And another function will read from it
+    /// So I need it in the same scope
+    unsigned int* _accu = nullptr;
+
+    // [(x₀, y₀), radious]
+    // Should make a class for this instead of this mess. Sorry
+    std::vector< std::pair< std::pair<int, int>, int> > circles;
+
+    if (step <= 0)
+        step = 2;
+
+    /// Iterate
+    for (int r = minRadius; r < maxRadius; r = r + step)
+    {
+
+        HoughCircleTransform(inImg.data, width, height, r, _accu);
+
+        if (threshold == 0)
+            threshold = 0.95 * (2.0 * (double)r * M_PI);
+
+        //Search the accumulator
+        GetCircles(threshold, circles, r, _accu, accuH, accuW);
+
+        //Draw the results
+        int maxa = 0;
+
+        for (int p = 0; p < (accuH * accuW); ++p)
+        {
+            if ((int) _accu[p] > maxa)
+                maxa = _accu[p];
+        }
+
+        double contrast = 1.0;
+        double coef = 255.0 / (double)maxa * contrast;
+
+        // Visualize accumulator graphic
+        /*
+        cv::Mat accuGraph(accuH, accuW, CV_8UC3);
+        for(int p = 0; p < (accuH * accuW); ++p)
+        {
+            unsigned char c = (double)accu[p] * coef < 255.0 ? (double)accu[p] * coef : 255.0;
+            accuGraph.data[(p*3)+0] = 255;
+            accuGraph.data[(p*3)+1] = 255-c;
+            accuGraph.data[(p*3)+2] = 255-c;
+        }
+        */
+
+
+        cv::imshow("out", inImg);
+        //cv::imshow(CW_ACCUMULATOR, accuGraph);
+
+        cv::waitKey(1);
+
+
+    } //.For each radius in value
+
+    // Sort
+    std::sort(circles.begin(), circles.end(), SortCirclesDistance());
+
+    int a, b, radius;
+    a = b = radius = 0;
+
+    std::vector< std::pair< std::pair<int, int>, int> > chosenCircles;
+    std::vector< std::pair< std::pair<int, int>, int> >::iterator it;
+    for(it = circles.begin(); it != circles.end(); ++it)
+    {
+        int d = sqrt( pow(abs(it->first.first - a), 2) + pow(abs(it->first.second - b), 2) );
+        if( d > it->second + radius)
+        {
+            chosenCircles.push_back(*it);
+            a = it->first.first;
+            b = it->first.second;
+            radius = it->second;
+        }
+    }
+
+    // Draw
+    std::cout << "Centers: " << std::endl;
+    for(it = chosenCircles.begin(); it != chosenCircles.end(); ++it)
+    {
+        cv::Point center(it->first.first,
+                         it->first.second);
+
+        cv::circle(outImg,
+                center,
+                3,
+                cv::Scalar(0,255,0),
+                -1,
+                8,
+                0);
+
+        std::cout <<"(" << it->first.first << ", " << it->first.second << ")" << std::endl;
+
+        cv::circle(outImg,
+                cv::Point(it->first.first, it->first.second),
+                it->second,
+                cv::Scalar(0,0,255),
+                2,
+                8);
+    }
+
+    // Dealloc memory
+    free(_accu);
+
+    std::cout << "Finished" << std::endl;
+    cv::imshow("out", outImg);
+    cv::waitKey(360000);
+}
+
+///
+/// In charge of accumulating votes
+void HoughCircleTransform(unsigned char* img_data, int width, int height, int r, unsigned int* &accu)
+{
+    int _r = r;
+
+    int accuH = height;
+    int accuW = width;
+
+    if(accu)
+        free(accu);
+
+    accu = (unsigned int*)calloc(accuH * accuW, sizeof(unsigned int));
+
+    int a, b = 0;
+
+    for (int y = 0; y < height; ++y)
+    {
+        for (int x = 0; x < width; ++x)
+        {
+            if (img_data[(y * width) + x] > 250)
+            {
+                for (int t = 1; t <= 360; ++t)
+                {
+                    ///
+                    /// a -> x₀ = x - R * cos(θ)
+                    /// b -> y₀ = y - R * sin(θ)
+                    a = ((double)x - ((double)_r * cos((double)t * RAD)));
+                    b = ((double)y - ((double)_r * sin((double)t * RAD)));
+
+                    // Just in case
+                    if ((b >= 0 && b < accuH) && (a >= 0 && a < accuW))
+                        accu[(b * accuW) + a]++;
+                }
+            }
+        }
+    }
+
+    return;
+}
+
+///
+/// Decides wether or not the votes in the accumulator are centers of circles
+void GetCircles(int threshold, std::vector<std::pair<std::pair<int, int>, int>>& circles, int r, unsigned int* &accu, const int accuH, const int accuW)
+{
+    int _r = r;
+
+    int found = 0;
+    // Not needed.
+
+    if (accu == 0)
+        return;
+
+    for (int b = 0;b < accuH; ++b)
+    {
+        for (int a = 0; a < accuW; ++a)
+        {
+            if ((int)accu[(b * accuW) + a] >= threshold)
+            {
+                //Is this point a local maxima (9x9)
+                int max = accu[(b*accuW) + a];
+                for (int ly = -4; ly <= 4; ++ly)
+                {
+                    for (int lx = -4; lx <= 4; ++lx)
+                    {
+                        if ((ly+b >= 0 && ly + b < accuH) && (lx + a >=0 && lx + a <accuW))
+                        {
+                            if ((int)accu[((b + ly) * accuW) + (a + lx)] > max)
+                            {
+                                max = accu[( (b+ly)*accuW) + (a+lx)];
+                                ly = lx = 5;
+                            }
+                        }
+                    }
+                }
+                if (max > (int)accu[(b*accuW) + a])
+                    continue;
+
+                circles.push_back(std::pair< std::pair<int, int>, int>(std::pair<int, int>(a,b), _r));
+                found++;
+
+            }
+        }
     }
 }
 
