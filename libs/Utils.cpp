@@ -547,7 +547,7 @@ void DetectLines(cv::Mat &inImg, cv::Mat &outImg, int threshold)
 /// TODO: Make a Class for Line instead of returning this pairs inside a pair inside a vector
 lineStruct GetLines(int threshold, unsigned int * &accu, int accuH, int accuW, int imgH, int imgW)
 {
-    std::vector< std::pair< std::pair<int, int>, std::pair<int, int> > > lines;
+    lineStruct lines;
     if(accu == 0)
         return lines;
 
@@ -615,7 +615,7 @@ void DrawLines(lineStruct &lines, cv::Mat &outImg)
     double m = 0;
     double y = 0;
     cv::RNG rng(98342);
-    std::vector< std::pair< std::pair<int, int>, std::pair<int, int> > >::iterator it;
+    lineStruct::iterator it;
     for(it = lines.begin(); it != lines.end(); it++)
     {
         // Draw line
@@ -662,7 +662,6 @@ void DetectCircles(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadius
     /// Iterate
     for (int radius = minRadius; radius < maxRadius; radius = radius + step)
     {
-
         HoughCircleTransform(inImg.data, width, height, radius, accumulator);
 
         if (threshold == 0)
@@ -670,9 +669,6 @@ void DetectCircles(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadius
 
         //Search the accumulator
         GetCircles(threshold, circles, radius, accumulator, accuH, accuW);
-
-        cv::imshow("out", inImg);
-        cv::waitKey(1);
 
     } //.For each radius in value
 
@@ -788,7 +784,7 @@ void GetCircles(int threshold, circleStruct& circles, int r, unsigned int* &accu
 
 void DrawCircles(cv::Mat& outImg, circleStruct& circles)
 {
-    std::vector< std::pair< std::pair<int, int>, int> >::iterator it;
+    circleStruct::iterator it;
 
     // Draw
     std::cout << "Centers: " << std::endl;
