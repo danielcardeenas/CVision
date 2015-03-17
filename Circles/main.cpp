@@ -13,31 +13,9 @@ int main(int argc, char** argv)
 {
     Mat colorImg = imread(argv[1], CV_LOAD_IMAGE_COLOR);
     Mat inImg = imread(argv[1], CV_LOAD_IMAGE_GRAYSCALE);
+    Mat joinImg = cv::Mat::zeros(inImg.size(), inImg.type());
+
     int threshold = 0;
-
-    //imshow("bin", final);
-    //waitKey(-1);
-
-    cv::Mat joinImg = cv::Mat::zeros(inImg.size(), inImg.type());
-    //cv::Mat imgAbs = cv::Mat::zeros(inImg.size(), inImg.type());
-    //cv::Mat gradY = cv::Mat::zeros(inImg.size(), inImg.type());
-    //cv::Mat gradX = cv::Mat::zeros(inImg.size(), inImg.type());
-    //cv::Mat bin = cv::Mat::zeros(inImg.size(), inImg.type());
-
-    // Supports n*n size
-    /// As long it's odd sized and squared
-    /// Kernel.cpp for more info
-    Kernel soby ({
-            {1,2,1},
-            {0,0,0},
-            {-1,-2,-1}
-    });
-
-    Kernel sobx ({
-            {-1,0,1},
-            {-2,0,2},
-            {-1,0,1}
-    });
 
     ///
     /// If a second parameter is given.
@@ -47,14 +25,21 @@ int main(int argc, char** argv)
         threshold = atoi(argv[2]);
 
     ///
-    /// Uncomment this lines if you want to use my functions for pre-processing
-    /// Convolution function is slow
-    //Convolution(inImg, gradX, sobx);
-    //Convolution(inImg, gradY, soby);
-    //EuclidianJoin(gradX, gradY, joinImg);
+    /// Create output filename
+    std::string filename(argv[1]);
+    std::string extension = ".jpg";
 
-    ///
-    /// Comment this if you're going to use the functions from above.
+    // find the last dot '.'
+    size_t pos = filename.find_last_of(".");
+
+    // make sure the poisition is valid
+    if (pos != string::npos)
+        extension = filename.substr(pos+1);
+    else
+        std::cout << "Coud not find . in the string\n";
+
+    std::string outputFileName = "detectedCircles." + extension;
+
     /// Canny is way more fast than two sobel convolutions.
     /// TODO: Implement Canny detection.
     cv::blur(inImg, joinImg, cv::Size(5,5));
@@ -74,5 +59,5 @@ int main(int argc, char** argv)
 
     std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
     std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " Miliseconds" <<std::endl;
-    imwrite("detectedCircles.jpg", colorImg);
+    imwrite(outputFileName, colorImg);
 }

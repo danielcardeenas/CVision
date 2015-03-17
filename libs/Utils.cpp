@@ -4,10 +4,7 @@
 #include <map>
 
 #include "Utils.h"
-#include "Coordinate.h"
-#include "Shape.h"
 #include "Filters.h"
-#include "Kernel.h"
 
 /// RAD = 0.017453293f (π / 180). Used to convert to radians
 #define RAD 0.017453293f
@@ -539,7 +536,7 @@ void DetectLines(cv::Mat &inImg, cv::Mat &outImg, int threshold)
     }
 
     //auto threshold: imgW > imgH? imgW/4: imgH/4
-    std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> lines = GetLines(threshold, accu, accuH, accuW, imgH, imgW);
+    lineStruct lines = GetLines(threshold, accu, accuH, accuW, imgH, imgW);
     DrawLines(lines, outImg);
 }
 
@@ -548,7 +545,7 @@ void DetectLines(cv::Mat &inImg, cv::Mat &outImg, int threshold)
 /// [(x1, y1), (x2, y2)]
 /// Only lines with an amount of votes above the threshold are selected
 /// TODO: Make a Class for Line instead of returning this pairs inside a pair inside a vector
-std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> GetLines(int threshold, unsigned int * &accu, int accuH, int accuW, int imgH, int imgW)
+lineStruct GetLines(int threshold, unsigned int * &accu, int accuH, int accuW, int imgH, int imgW)
 {
     std::vector< std::pair< std::pair<int, int>, std::pair<int, int> > > lines;
     if(accu == 0)
@@ -612,7 +609,7 @@ std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> GetLines(int th
 
 ///
 /// Draw lines in img
-void DrawLines(std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> &lines, cv::Mat &outImg)
+void DrawLines(lineStruct &lines, cv::Mat &outImg)
 {
     int id = 0;
     double m = 0;
@@ -653,61 +650,152 @@ void DetectCircles(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadius
     /// Set to nullptr because another function will manage the accumulator (free and fill)
     /// And another function will read from it
     /// So I need it in the same scope
-    unsigned int* _accu = nullptr;
+    unsigned int* accumulator = nullptr;
 
-    // [(x₀, y₀), radious]
-    // Should make a class for this instead of this mess. Sorry
-    std::vector< std::pair< std::pair<int, int>, int> > circles;
+    // [(x₀, y₀), radius]
+    // Go to Utils.h for the definition of circleStruct
+    circleStruct circles;
 
     if (step <= 0)
         step = 2;
 
     /// Iterate
-    for (int r = minRadius; r < maxRadius; r = r + step)
+    for (int radius = minRadius; radius < maxRadius; radius = radius + step)
     {
 
-        HoughCircleTransform(inImg.data, width, height, r, _accu);
+        HoughCircleTransform(inImg.data, width, height, radius, accumulator);
 
         if (threshold == 0)
-            threshold = 0.95 * (2.0 * (double)r * M_PI);
+            threshold = 0.85 * (2.0 * (double)radius * M_PI);
 
         //Search the accumulator
-        GetCircles(threshold, circles, r, _accu, accuH, accuW);
+        GetCircles(threshold, circles, radius, accumulator, accuH, accuW);
 
         cv::imshow("out", inImg);
-        //cv::imshow("accu", accuGraph);
-
         cv::waitKey(1);
-
 
     } //.For each radius in value
 
-    // Sort
-    std::sort(circles.begin(), circles.end(), SortCirclesDistance());
+    DrawCircles(outImg, circles);
 
-    int a, b, radius;
-    a = b = radius = 0;
+    // Dealloc memory
+    free(accumulator);
 
-    std::vector< std::pair< std::pair<int, int>, int> > chosenCircles;
-    std::vector< std::pair< std::pair<int, int>, int> >::iterator it;
-    for(it = circles.begin(); it != circles.end(); ++it)
+    std::cout << "Finished" << std::endl;
+    //cv::imshow("out", outImg);
+    //cv::waitKey(360000);
+}
+
+///
+/// In charge of accumulating votes
+void HoughCircleTransform(unsigned char* img_data, int width, int height, int r, unsigned int* &accumulator)
+{
+    int radius = r;
+
+    int accuH = height;
+    int accuW = width;
+
+    if(accumulator)
+        free(accumulator);
+
+    accumulator = (unsigned int*)calloc(accuH * accuW, sizeof(unsigned int));
+
+    ///
+    /// x₀ -> a
+    /// y₀ -> b
+    int a, b = 0;
+
+    for (int y = 0; y < height; ++y)
     {
-        int d = sqrt( pow(abs(it->first.first - a), 2) + pow(abs(it->first.second - b), 2) );
-        if( d > it->second + radius)
+        for (int x = 0; x < width; ++x)
         {
-            chosenCircles.push_back(*it);
-            a = it->first.first;
-            b = it->first.second;
-            radius = it->second;
+            if (img_data[(y * width) + x] > 250)
+            {
+                for (int t = 1; t <= 360; ++t)
+                {
+                    ///
+                    /// a -> x₀ = x - R * cos(θ)
+                    /// b -> y₀ = y - R * sin(θ)
+                    a = ((double)x - ((double)radius * cos((double)t * RAD)));
+                    b = ((double)y - ((double)radius * sin((double)t * RAD)));
+
+                    // Just in case
+                    if ((b >= 0 && b < accuH) && (a >= 0 && a < accuW))
+                        accumulator[(b * accuW) + a]++;
+                }
+            }
         }
     }
 
+    return;
+}
+
+///
+/// Decides whether or not the votes in the accumulator are centers of circles
+void GetCircles(int threshold, circleStruct& circles, int r, unsigned int* &accumulator, const int accuH, const int accuW)
+{
+    int radius = r;
+
+    int found = 0;
+    // Not needed.
+
+    if (accumulator == 0)
+        return;
+
+    ///
+    /// x₀ -> a
+    /// y₀ -> b
+    for (int b = 0; b < accuH; ++b)
+    {
+        for (int a = 0; a < accuW; ++a)
+        {
+            if ((int)accumulator[(b * accuW) + a] >= threshold)
+            {
+                ///
+                /// Get the max of this 9x9 point
+                /// Accumulator at this point:
+                ///     Literal representation
+                ///         □□□□□□□□□
+                ///     Relative representation
+                ///         □□□
+                ///         □□□
+                ///         □□□
+                int max = accumulator[(b * accuW) + a];
+                for (int literalY = -4; literalY <= 4; ++literalY)
+                {
+                    for (int literalX = -4; literalX <= 4; ++literalX)
+                    {
+                        if ((literalY+b >= 0 && literalY + b < accuH) && (literalX + a >=0 && literalX + a <accuW))
+                        {
+                            if ((int) accumulator[((b + literalY) * accuW) + (a + literalX)] > max)
+                            {
+                                max = accumulator[( (b+literalY)*accuW) + (a+literalX)];
+                                literalY = literalX = 5;
+                            }
+                        }
+                    }
+                }
+                if (max > (int) accumulator[(b*accuW) + a])
+                    continue;
+
+                circles.push_back(std::pair< std::pair<int, int>, int>(std::pair<int, int>(a,b), radius));
+                found++;
+
+            }
+        }
+    }
+}
+
+void DrawCircles(cv::Mat& outImg, circleStruct& circles)
+{
+    std::vector< std::pair< std::pair<int, int>, int> >::iterator it;
+
     // Draw
     std::cout << "Centers: " << std::endl;
-    for(it = chosenCircles.begin(); it != chosenCircles.end(); ++it)
+    for(it = circles.begin(); it != circles.end(); ++it)
     {
         cv::Point center(it->first.first,
-                         it->first.second);
+                it->first.second);
 
         // Draw center
         cv::circle(outImg,
@@ -748,99 +836,6 @@ void DetectCircles(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadius
                 cv::Scalar(0, 176, 255),
                 3,
                 8);
-    }
-
-    // Dealloc memory
-    free(_accu);
-
-    std::cout << "Finished" << std::endl;
-    //cv::imshow("out", outImg);
-    //cv::waitKey(360000);
-}
-
-///
-/// In charge of accumulating votes
-void HoughCircleTransform(unsigned char* img_data, int width, int height, int r, unsigned int* &accu)
-{
-    int _r = r;
-
-    int accuH = height;
-    int accuW = width;
-
-    if(accu)
-        free(accu);
-
-    accu = (unsigned int*)calloc(accuH * accuW, sizeof(unsigned int));
-
-    int a, b = 0;
-
-    for (int y = 0; y < height; ++y)
-    {
-        for (int x = 0; x < width; ++x)
-        {
-            if (img_data[(y * width) + x] > 250)
-            {
-                for (int t = 1; t <= 360; ++t)
-                {
-                    ///
-                    /// a -> x₀ = x - R * cos(θ)
-                    /// b -> y₀ = y - R * sin(θ)
-                    a = ((double)x - ((double)_r * cos((double)t * RAD)));
-                    b = ((double)y - ((double)_r * sin((double)t * RAD)));
-
-                    // Just in case
-                    if ((b >= 0 && b < accuH) && (a >= 0 && a < accuW))
-                        accu[(b * accuW) + a]++;
-                }
-            }
-        }
-    }
-
-    return;
-}
-
-///
-/// Decides wether or not the votes in the accumulator are centers of circles
-void GetCircles(int threshold, std::vector<std::pair<std::pair<int, int>, int>>& circles, int r, unsigned int* &accu, const int accuH, const int accuW)
-{
-    int _r = r;
-
-    int found = 0;
-    // Not needed.
-
-    if (accu == 0)
-        return;
-
-    for (int b = 0;b < accuH; ++b)
-    {
-        for (int a = 0; a < accuW; ++a)
-        {
-            if ((int)accu[(b * accuW) + a] >= threshold)
-            {
-                //Is this point a local maxima (9x9)
-                int max = accu[(b*accuW) + a];
-                for (int ly = -4; ly <= 4; ++ly)
-                {
-                    for (int lx = -4; lx <= 4; ++lx)
-                    {
-                        if ((ly+b >= 0 && ly + b < accuH) && (lx + a >=0 && lx + a <accuW))
-                        {
-                            if ((int)accu[((b + ly) * accuW) + (a + lx)] > max)
-                            {
-                                max = accu[( (b+ly)*accuW) + (a+lx)];
-                                ly = lx = 5;
-                            }
-                        }
-                    }
-                }
-                if (max > (int)accu[(b*accuW) + a])
-                    continue;
-
-                circles.push_back(std::pair< std::pair<int, int>, int>(std::pair<int, int>(a,b), _r));
-                found++;
-
-            }
-        }
     }
 }
 
