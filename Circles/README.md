@@ -47,18 +47,27 @@ The function can work without giving any parameters at all, the program can choo
 4.  [`~Draw()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L730), here just draws the circles giving its center coordinate and radius. (Sorry for the sleepy code here, this should be inside a method).
 
 ### Samples
-#####Threshold: 100 votes
 
-**Input**: ```img/chessboard1.png```
-**Outputs**: ```chess_100.jpg```
+#####Threshold: 135
 
-<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Lines/img/chessboard1.png" width="320" height="240" />
-<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Lines/chess_100.jpg" width="320" height="240" />
+**Input**: ```img/fig.png```
+**Outputs**: ```figCircles135.jpg```
 
-#####Threshold: 200 votes
+<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Circles/img/fig.png" width="320" height="240" />
+<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Circles/figCircles135.jpg" width="320" height="240" />
 
-**Input**: ```img/chessboard1.png```
-**Outputs**: ```chess_200.jpg```
+#####Threshold: 90
 
-<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Lines/img/chessboard1.png" width="320" height="240" />
-<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Lines/chess_200.jpg" width="320" height="240" />
+**Input**: ```img/billar2.jpg```
+**Outputs**: ```billar90.jpg```
+
+<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Circles/img/billar2.jpg" width="320" height="240" />
+<img src="https://github.com/danielcardeenas/CVision/blob/master/Circles/billar90.jpg" width="320" height="240" />
+
+#####Threshold: Auto
+
+**Input**: ```img/pool6.jpg```
+**Outputs**: ```billar90.jpg```
+
+<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Circles/img/pool6.jpg" width="320" height="240" />
+<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Circles/poolAuto.jpg" width="320" height="240" />
