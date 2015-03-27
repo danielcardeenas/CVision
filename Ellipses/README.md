@@ -41,8 +41,9 @@ $ ./ellipse <img_to_use.jpg> <[int]threshold (optional)>
 
 
 ######NOTE:
-The algorithm runs VERY slow (so the images used in the examples are small) but the accumulator ended up being just one-dimensioned.
-Anyways, the method seems to lack on precision so I will implement the normal Hough Transform on this to get better results.
+The algorithm runs VERY slow (therefore the images used in the examples are small and simple) but the accumulator ended up being just one-dimensioned.
+
+Anyways, the method seems to lack on precision so I will implement the normal Hough Transform on this to get better results even if it's slow.
 Some modifications to the method have been done in oder to make it work faster.
 
 #####Threshold: auto
