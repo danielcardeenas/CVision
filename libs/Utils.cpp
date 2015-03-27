@@ -803,7 +803,6 @@ void DrawCircles(cv::Mat& outImg, circleStruct& circles)
                 0);
 
         std::cout <<"(" << it->first.first << ", " << it->first.second << ")" << std::endl;
-
         // Draw radius line and text.
         // Might want to comment if the image is too small
         cv::line(outImg,
@@ -833,6 +832,269 @@ void DrawCircles(cv::Mat& outImg, circleStruct& circles)
                 3,
                 8);
     }
+}
+
+///
+/// Hough Circles Transform
+/// @param:
+///     cv::Mat &inImg: input image
+///      cv::Mat &outImg: output image
+///      int threshold: [auto if not defined]
+///      int minRadius: [20 if not defined],
+///      int maxRadius: [250 if not defined],
+///      int step : [4 if not defined]
+void DetectEllipses(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadius, int maxRadius, int step)
+{
+    const int width = inImg.cols;
+    const int height = inImg.rows;
+
+    const int accuH = height;
+    const int accuW = width;
+
+    ///
+    /// Set this as parameter.
+    /// Minimum distance from (x1, y1) to (x2, y2)
+    /// Or minimum major axis. same shit
+    int min2a = 120;
+
+    // Thresholding
+    if (threshold <= 0)
+        threshold = 50;
+
+    threshold = 200;
+
+    int minVotes = threshold;
+
+    // distance from (x1, y1) to (x2, y2)
+    double distance;
+
+    // distance from (x0, y0) to (x, y)
+    double distance0;
+
+    // Centers
+    int x0, y0;
+
+    // Helf-lenght of the major axis
+    double a;
+
+    // Helf-lenght of the minor axis
+    int b;
+
+    // Orientation
+    double alpha;
+
+    // Foci
+    double f;
+
+    // cos²τ and sin²τ
+    double cos_tau, cos2_tau, sin2_tau;
+
+    ///
+    /// Accumulator for votes -> memory block
+    /// Set to nullptr because another function will manage the accumulator (free and fill)
+    /// And another function will read from it
+    /// So I need it in the same scope
+    //unsigned int* accumulator = nullptr
+    unsigned int* accumulator = (unsigned int*)calloc(std::max(width, height)/2, sizeof(unsigned int));
+
+    // [(x₀, y₀), radius]
+    // Go to Utils.h for the definition of circleStruct
+    std::vector<Ellipse> ellipses;
+
+    uchar touched = 128;
+
+    if (step <= 0)
+        step = 2;
+
+    for (int y1 = 0; y1 < height; y1 = y1 + 3)
+        for (int x1 = 0; x1 < width; x1 = x1 + 3)
+        {
+            //std::cout << "loop: (" << x1 << ", " << y1 << ")" << std::endl;
+            if (inImg.ptr<uchar>(y1)[x1] > 250)
+            {
+                // (4) - (14)
+                //std::cout << "border at: (" << x1 << ", " << y1 << ")" << std::endl;
+                for (int y2 = height; y2 > 0; y2 = y2 - 3)
+                    for (int x2 = width; x2 > 0; x2 = x2 - 3)
+                        if (inImg.ptr<uchar>(y2)[x2] > 250)
+                        {
+                            // Distance of these points.
+                            distance = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+
+                            // If distance greater that the required
+                            if (distance > min2a)
+                            {
+                                // (5) - (14)
+                                x0 = (x1 + x2) / 2;
+                                y0 = (y1 + y2) / 2;
+                                a = distance / 2;
+                                alpha = atan2((y2 - y1), (x2 - x1));
+
+                                // Step (6)
+                                // For each third pixel
+                                for (int y = 0; y < height; y = y + 3)
+                                    for (int x = 0; x < width; x = x + 3)
+                                    {
+                                        if ((x == x2) && (y == y2) && (x == x1) && (y == y1))
+                                            continue;
+
+                                        distance0 = sqrt((x - x0) * (x - x0) + (y - y0) * (y - y0));
+
+                                        // Distance from (x0, y0) to (x, y) must be less than the distance \
+                                        // between (x1, y1) - (x0, y0) OR (x2, y2) - (x0, y0) OR
+                                        if (distance0 >= a)
+                                            continue;
+
+                                        // (7) - (9)
+
+                                        // Foci
+                                        f = distance0 = sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2));
+
+                                        // cos²τ and sin²τ
+                                        cos_tau = ((pow(a, 2) + pow(distance0, 2) - pow(f, 2)) / (2 * a * distance0));
+                                        cos2_tau = pow(cos2_tau, 2);
+                                        sin2_tau = 1 - cos2_tau;
+                                        b = round(sqrt((pow(a, 2) * pow(distance0, 2) * sin2_tau * RAD) / (pow(a, 2) - pow(distance0, 2) * cos2_tau * RAD)));
+
+                                        if (b > 0 && b < std::max(width, height) / 2)
+                                            accumulator[b]++;
+                                    }
+                            }
+
+                            // Search for highest scores
+                            // Get the maximum value by index
+                            int indexB = findMaximum(accumulator, std::max(width, height) / 2);
+                            std::cout << accumulator[indexB] << std::endl;
+
+                            if (accumulator[indexB] > minVotes)
+                            {
+                                // Ellipse detected
+                                std::cout << "Ellipse detected: (" << x0 << ", " << y0 << ") ->" << accumulator[indexB] << std::endl;
+                                inImg.ptr<uchar>(y1)[x1] = touched;
+
+                                Ellipse tempEllipse(Coordinate(x0, y0),
+                                        a,
+                                        indexB,
+                                        alpha,
+                                        accumulator[indexB]);
+
+                                ellipses.push_back(tempEllipse);
+                            }
+
+                            // Clear accumulator
+                            if (accumulator)
+                                free(accumulator);
+
+                            accumulator = (unsigned int *) calloc(std::max(width, height) / 2, sizeof(unsigned int));
+
+                        }
+            }
+        }
+
+    // Draw
+    std::cout << "Centers: " << std::endl;
+    for(std::vector<Ellipse>::iterator it = ellipses.begin(); it != ellipses.end(); ++it)
+    {
+        cv::Point center (it->center.x,
+                it->center.y);
+
+        // Draw center
+        cv::circle(outImg,
+                center,
+                1,
+                cv::Scalar(255, 255, 0),
+                1,
+                8,
+                0);
+
+        cv::Size axes (it->a, it->b*2);
+
+        cv::ellipse(outImg,
+                center,
+                axes,
+                it->alpha,
+                0,
+                360,
+                cv::Scalar(0, 255, 255),
+                1,
+                8,
+                0);
+    }
+
+    /*
+    auto max = std::min_element( ellipses.begin(), ellipses.end(),
+            []( const Ellipse &a, const Ellipse &b )
+            {
+                return a.votes < b.votes;
+            } );
+
+    std::sort(ellipses.begin(), ellipses.end(), less_than_key());
+    auto med = ellipses.at((ellipses.size() / 2) + );
+
+    cv::Point center (med.center.x,
+            med.center.y);
+
+    // Draw center
+    cv::circle(outImg,
+            center,
+            1,
+            cv::Scalar(255, 255, 0),
+            5,
+            8,
+            0);
+
+    cv::Size axes (med.a, med.b*2);
+
+    cv::ellipse(outImg,
+            center,
+            axes,
+            med.alpha,
+            0,
+            360,
+            cv::Scalar(0, 255, 255),
+            1,
+            8,
+            0);
+
+    */
+
+    // Draw b
+    /*
+    cv::line(outImg,
+            center,
+            cv::Point(max->center.x + a, max->center.y),
+            cv::Scalar(100, 0, 255),
+            1,
+            8,
+            0);
+    */
+
+    std::cout << "Finished" << std::endl;
+    //cv::imshow("out", outImg);
+    //cv::waitKey(360000);
+
+    // Dealloc memory
+    if(accumulator)
+        free(accumulator);
+}
+
+int findMaximum(unsigned int* &a, int n)
+{
+    int c, max, index;
+
+    max = a[0];
+    index = 0;
+
+    for (c = 1; c < n; c++)
+    {
+        if (a[c] > max)
+        {
+            index = c;
+            max = a[c];
+        }
+    }
+
+    return index;
 }
 
 ///
