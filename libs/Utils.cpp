@@ -910,13 +910,13 @@ void DetectEllipses(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadiu
         for (int x1 = 0; x1 < width; x1 = x1 + 3)
         {
             //std::cout << "loop: (" << x1 << ", " << y1 << ")" << std::endl;
-            if (inImg.ptr<uchar>(y1)[x1] > 250)
+            if (inImg.ptr<uchar>(y1)[x1] > 250 && inImg.ptr<uchar>(y1)[x1] != touched)
             {
                 // (4) - (14)
                 //std::cout << "border at: (" << x1 << ", " << y1 << ")" << std::endl;
                 for (int y2 = height; y2 > 0; y2 = y2 - 3)
                     for (int x2 = width; x2 > 0; x2 = x2 - 3)
-                        if (inImg.ptr<uchar>(y2)[x2] > 250)
+                        if (inImg.ptr<uchar>(y2)[x2] > 250 && inImg.ptr<uchar>(y2)[x2] != touched)
                         {
                             // Distance of these points.
                             distance = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
@@ -964,12 +964,11 @@ void DetectEllipses(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadiu
                             // Search for highest scores
                             // Get the maximum value by index
                             int indexB = findMaximum(accumulator, std::max(width, height) / 2);
-                            std::cout << accumulator[indexB] << std::endl;
 
                             if (accumulator[indexB] > minVotes)
                             {
                                 // Ellipse detected
-                                std::cout << "Ellipse detected: (" << x0 << ", " << y0 << ") ->" << accumulator[indexB] << std::endl;
+                                std::cout << "Possible ellipse detected: (" << x0 << ", " << y0 << ") ->" << accumulator[indexB] << std::endl;
                                 inImg.ptr<uchar>(y1)[x1] = touched;
 
                                 Ellipse tempEllipse(Coordinate(x0, y0),
@@ -992,6 +991,7 @@ void DetectEllipses(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadiu
         }
 
     // Draw
+    /*
     std::cout << "Centers: " << std::endl;
     for(std::vector<Ellipse>::iterator it = ellipses.begin(); it != ellipses.end(); ++it)
     {
@@ -1020,8 +1020,8 @@ void DetectEllipses(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadiu
                 8,
                 0);
     }
+    */
 
-    /*
     auto max = std::min_element( ellipses.begin(), ellipses.end(),
             []( const Ellipse &a, const Ellipse &b )
             {
@@ -1029,7 +1029,7 @@ void DetectEllipses(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadiu
             } );
 
     std::sort(ellipses.begin(), ellipses.end(), less_than_key());
-    auto med = ellipses.at((ellipses.size() / 2) + );
+    auto med = ellipses.at((ellipses.size() / 2) - 5);
 
     cv::Point center (med.center.x,
             med.center.y);
@@ -1055,8 +1055,6 @@ void DetectEllipses(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadiu
             1,
             8,
             0);
-
-    */
 
     // Draw b
     /*

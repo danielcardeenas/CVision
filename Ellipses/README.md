@@ -1,5 +1,5 @@
-# Circle detection
-Detects the circles of a given image using [Hough transform](http://en.wikipedia.org/wiki/Hough_transform).
+# Ellipse detection
+Detects the circles of a given image using [This method](http://hci.iwr.uni-heidelberg.de/publications/dip/2002/ICPR2002/DATA/07_3_20.PDF).
 
 ### Compiling
 
@@ -7,27 +7,28 @@ Clone this repository and build the project using [CMake](http://www.cmake.org/d
 
 ```sh
 $ git clone https://github.com/danielcardeenas/CVision.git
-$ cd CVision/Circles/
+$ cd CVision/Ellipses/
 $ cmake .
 $ make
 ```
 ### Run
 ```sh
-$ ./circles <img_to_use.jpg> <[int]threshold (optional)>
+$ ./ellipse <img_to_use.jpg> <[int]threshold (optional)>
 ```
 #####Outputs
 
 ```sh
 > Centers:
-> (260, 144)
-> (317, 420)
+> Possible ellipse detected: (201, 110) ->203
+> Possible ellipse detected: (193, 110) ->214
+> Possible ellipse detected: (192, 110) ->216
 ...
-> Time elapsed: 3038 Miliseconds
+> Time elapsed: 7476 Miliseconds
 
 ```
 
 
-**Centers:** Circle's center coordinates
+**Centers:** Ellipse's center coordinates
 
 ### Explanation
 
