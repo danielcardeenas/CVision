@@ -1,5 +1,6 @@
 # Ellipse detection
 Detects the circles of a given image using [This method](http://hci.iwr.uni-heidelberg.de/publications/dip/2002/ICPR2002/DATA/07_3_20.PDF).
+Some modifications to the method have been done in oder to make it work faster.
 
 ### Compiling
 
@@ -46,7 +47,6 @@ Sorry for the one big function code. I will refactor this, altough, a good expla
 The algorithm runs VERY slow (therefore the images used in the examples are small and simple) but the accumulator ended up being just one-dimensioned.
 
 Anyways, the method seems to lack on precision so I will implement the normal Hough Transform on this to get better results even if it's slow.
-Some modifications to the method have been done in oder to make it work faster.
 
 #####Threshold: auto
 
