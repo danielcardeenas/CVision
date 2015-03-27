@@ -990,8 +990,6 @@ void DetectEllipses(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minMajor
         }
 
     // Draw
-    /*
-    std::cout << "Centers: " << std::endl;
     for(std::vector<Ellipse>::iterator it = ellipses.begin(); it != ellipses.end(); ++it)
     {
         cv::Point center (it->center.x,
@@ -1019,8 +1017,8 @@ void DetectEllipses(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minMajor
                 8,
                 0);
     }
-    */
 
+/*
     auto max = std::min_element( ellipses.begin(), ellipses.end(),
             []( const Ellipse &a, const Ellipse &b )
             {
@@ -1054,6 +1052,7 @@ void DetectEllipses(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minMajor
             1,
             8,
             0);
+*/
 
     // Draw b
     /*
