@@ -52,7 +52,7 @@ void DrawCircles(cv::Mat& outImg, circleStruct& circles);
      Ellipses detection
      --------------------------------------------------------------------------
 */
-void DetectEllipses(cv::Mat &inImg, cv::Mat &outImg, int threshold = 0, int minRadius = 20, int maxRadius = 250, int step = 4);
+void DetectEllipses(cv::Mat &inImg, cv::Mat &outImg, int threshold = 0, int minMajorAxis = 120);
 int findMaximum(unsigned int* &a, int n);
 
 #endif // __UTILS_H_INCLUDED__

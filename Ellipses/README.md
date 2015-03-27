@@ -34,11 +34,7 @@ $ ./ellipse <img_to_use.jpg> <[int]threshold (optional)>
 
 ---------------------------------------
 
-1.  Inside `main.cpp` calls [`DetectCircles()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L640). Since each image has his own best values, these are the *tweakable* parameters
-  + Threshold (from terminal)
-  + Minimum radius accepted
-  + Maximum radius accepted
-  + Steps to take for each radius iteration
+1.  Inside `main.cpp` calls [`DetectEllipses()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L846). 
 
 ######NOTE:
 The function can work without giving any parameters at all, the program can choose their values by [itself](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L672).

@@ -843,7 +843,7 @@ void DrawCircles(cv::Mat& outImg, circleStruct& circles)
 ///      int minRadius: [20 if not defined],
 ///      int maxRadius: [250 if not defined],
 ///      int step : [4 if not defined]
-void DetectEllipses(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadius, int maxRadius, int step)
+void DetectEllipses(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minMajorAxis)
 {
     const int width = inImg.cols;
     const int height = inImg.rows;
@@ -854,14 +854,16 @@ void DetectEllipses(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadiu
     ///
     /// Set this as parameter.
     /// Minimum distance from (x1, y1) to (x2, y2)
-    /// Or minimum major axis. same shit
-    int min2a = 120;
+    /// Or minimum major axis. same thing
+    int min2a;
+    if (minMajorAxis <= 0)
+        min2a = 120;
+    else
+        min2a = minMajorAxis;
 
     // Thresholding
     if (threshold <= 0)
-        threshold = 50;
-
-    threshold = 200;
+        threshold = 150;
 
     int minVotes = threshold;
 
@@ -902,9 +904,6 @@ void DetectEllipses(cv::Mat &inImg, cv::Mat &outImg, int threshold, int minRadiu
     std::vector<Ellipse> ellipses;
 
     uchar touched = 128;
-
-    if (step <= 0)
-        step = 2;
 
     for (int y1 = 0; y1 < height; y1 = y1 + 3)
         for (int x1 = 0; x1 < width; x1 = x1 + 3)
