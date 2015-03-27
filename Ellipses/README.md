@@ -36,7 +36,8 @@ $ ./ellipse <img_to_use.jpg> <[int]threshold (optional)>
 ---------------------------------------
 
 1.  Inside `main.cpp` calls [`DetectEllipses()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L846). 
-2.  Accumulates by minor axis [`DetectEllipses()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L959). 
+2.  Accumulates by minor axis [`DetectEllipses()~~`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L959). 
+3.  Properties of each ellipse found: [`Ellipse.h`](https://github.com/danielcardeenas/CVision/blob/master/libs/Ellipse.h).
 
 Sorry for the one big function code. I will refactor this, altough, a good explanation can be found on the comments
 
