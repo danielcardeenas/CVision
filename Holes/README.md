@@ -19,48 +19,47 @@ $ ./ellipse <img_to_use.jpg> <[int]threshold (optional)>
 #####Outputs
 
 ```sh
-> Centers:
-> Possible ellipse detected: (201, 110) ->203
-> Possible ellipse detected: (193, 110) ->214
-> Possible ellipse detected: (192, 110) ->216
+> Hole0 Dimensions: 3x43
+> Hole1 Dimensions: 39x193
+> Hole2 Dimensions: 2x54
+> Hole3 Dimensions: 3x13
+> Hole4 Dimensions: 3x22
 ...
-> Time elapsed: 7476 Miliseconds
+> Time elapsed: 5 Miliseconds
 
 ```
 
 
-**Centers:** Ellipse's center coordinates->votes
+**Dimensions:** Holes bounding-box area
 
 ### Explanation
 
 ---------------------------------------
 
-1.  Inside `main.cpp` calls [`DetectEllipses()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L846). 
-2.  Accumulates by minor axis [`DetectEllipses()~~`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L959). 
-3.  Properties of each ellipse found: [`Ellipse.h`](https://github.com/danielcardeenas/CVision/blob/master/libs/Ellipse.h).
-
-Sorry for the one big function code. I will refactor this, altough, a good explanation can be found on the comments
+1.  Inside `main.cpp` calls [`DetectHoles()`](https://github.com/danielcardeenas/CVision/blob/master/libs/NewUtils.cpp#L8). 
+2.  DFS only selected whites by histogram (This improves speed a lot by ignoring everything else) [`DFSHist()~~`](https://github.com/danielcardeenas/CVision/blob/master/libs/NewUtils.cpp#L46). 
 
 ### Samples
 
 
 ######NOTE:
-The algorithm runs VERY slow (therefore the images used in the examples are small and simple) but the accumulator ended up being just one-dimensioned.
+The algorithm detects holes even when the inside of them its white / black.
 
-Anyways, the method seems to lack on precision so I will implement the normal Hough Transform on this to get better results even if it's slow.
 
-#####Threshold: auto
+**Input**: ```img/bullet2.jpg```
+**Outputs**: ```outbullet2.jpg```
 
-**Input**: ```img/ellipse.png```
-**Outputs**: ```ellipsemin.png```
+<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Holes/img/bullet2.jpg" width="320" height="240" />
+<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Holes/outbullet2.jpg" width="320" height="240" />
 
-<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Ellipses/img/ellipse.png" width="320" height="240" />
-<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Ellipses/ellipsemin.png" width="320" height="240" />
+**Input**: ```img/bullet.jpg```
+**Outputs**: ```outbullet.jpg```
 
-#####Threshold: auto
+<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Holes/img/bullet.jpg" width="320" height="240" />
+<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Holes/outbullet.jpg" width="320" height="240" />
 
-**Input**: ```img/fig2.jpg```
-**Outputs**: ```ellipsefig2.jpg```
+**Input**: ```img/wall3.png```
+**Outputs**: ```outwall3.jpg```
 
-<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Ellipses/img/fig2.jpg" width="320" height="240" />
-<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Ellipses/ellipsefig2.jpg" width="320" height="240" />
+<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Holes/img/wall3.png" width="320" height="240" />
+<img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Holes/outwall3.jpg" width="320" height="240" />

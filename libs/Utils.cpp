@@ -384,15 +384,21 @@ void DrawShapes(cv::Mat& inImg, std::vector<Shape> shapes)
                 thickness
         );
 
-        cv::putText(inImg,
+        /*cv::putText(inImg,
                 shape.getName(),
-                pt1,
+                cv::Point (box[1].x+5, box[1].y-5),
                 CV_FONT_HERSHEY_PLAIN,
-                2.0,
+                1.0,
                 color,
                 2,
                 8,
-                false);
+                false);*/
+
+        // Get bounding box dimensions
+        int x = box[3].x - box[0].x;
+        int y = box[1].y - box[0].y;
+
+        std::cout << "Hole" << shape.getName() << " Dimensions: " << x << "x" << y << std::endl;
 
     }
 }

@@ -9,10 +9,11 @@
 #include <stack>
 #include "Coordinate.h"
 #include "Shape.h"
+#include "Utils.h"
 
 void DetectHoles(cv::Mat inImg, cv::Mat outImg);
 template <class T> int GetSum(T &v, int size);
 void DoubleThreshold(cv::Mat& inImg, cv::Mat& outImg);
-void DFSHist(cv::Mat& inImg, std::vector<int>& colsValues, std::vector<int>& rowsValues);
+std::vector<Shape> DFSHist(cv::Mat& inImg, std::vector<int>& colsValues, std::vector<int>& rowsValues);
 
 #endif //ELLIPSES_NEWUTILS_H

@@ -34,13 +34,16 @@ void DetectHoles(cv::Mat inImg, cv::Mat outImg)
        colsValues.push_back(GetSum(charCol, nCols));
     }
     
-    //std::cout << colsValues.size() << std::endl;
-    
-    //DFS only the whites in both vectors (cols and rows).
-    DFSHist (inImg, colsValues, rowsValues);
+    // DFS only the whites in both vectors (cols and rows).
+    std::vector<Shape> holes = DFSHist (inImg, colsValues, rowsValues);
+
+    // Draw holes detected
+    DrawShapes(outImg, holes);
+
+    cv::imwrite("finaldetection.jpg", outImg);
 }
 
-void DFSHist(cv::Mat& inImg, std::vector<int>& colsValues, std::vector<int>& rowsValues)
+std::vector<Shape> DFSHist(cv::Mat& inImg, std::vector<int>& colsValues, std::vector<int>& rowsValues)
 {
     int MAXH = inImg.rows;
     int MAXW = inImg.cols;
@@ -64,60 +67,62 @@ void DFSHist(cv::Mat& inImg, std::vector<int>& colsValues, std::vector<int>& row
         for (int j = 0; j < MAXW - 1; j++)
         {
             // Make sure to only go trough the holes detected in the histogram
-            if (rowsValues[i] > 128 && colsValues[j] > 128)
+            if (inImg.at<uchar>(i, j) > 250)
             {
                 stack.push(Coordinate(j, i));
                 current = inImg.at<uchar>(i, j);
-    
+
                 if(current != spotted)
                 {
                     //New object detected
                     _ob++;
                     holes.push_back(Shape(std::to_string(_ob)));
                 }
-    
+                else
+                    continue;
+
                 while(!stack.empty())
                 {
                     point = stack.top();
                     stack.pop();
-                    if(inImg.at<uchar>(point.y, point.x) != spotted)
+                    if(inImg.at<uchar>(point.y, point.x) != spotted && inImg.at<uchar>(point.y, point.x) == probHole)
                     {
                         // If not already spotted before
                         // Spot it
                         inImg.at<uchar>(point.y, point.x) = spotted;
                         holes[_ob].addCoordinate(Coordinate(point.x, point.y));
-    
+
                         num++;
                         holes[_ob].putValues(point.x, point.y, num);
-    
+
                         // Show real time
                         //cv::imshow("Demo", inImg);
                         //cv::waitKey(1);
-    
+
                         /// Add neighbors to stack
                         /// They must be inside of bounds and must have not been spotted before
                         // Below neighbor
-                        if((point.y + 1 < MAXH) && inImg.at<uchar>(point.y + 1, point.x) == probHole)
+                        if((point.y + 1 < MAXH) && inImg.at<uchar>(point.y + 1, point.x) != spotted)
                             stack.push(Coordinate(point.x, point.y + 1));
-    
+
                         // Above neighbor
-                        if((point.y - 1 > 0) && inImg.at<uchar>(point.y - 1, point.x) == probHole)
+                        if((point.y - 1 > 0) && inImg.at<uchar>(point.y - 1, point.x) != spotted)
                             stack.push(Coordinate(point.x, point.y - 1));
-    
+
                         // Left neighbor
-                        if((point.x - 1 >= 0) && inImg.at<uchar>(point.y, point.x - 1) == probHole)
+                        if((point.x - 1 >= 0) && inImg.at<uchar>(point.y, point.x - 1) != spotted)
                             stack.push(Coordinate(point.x - 1, point.y));
-    
+
                         // Right neighbor
-                        if((point.x + 1 < MAXW) && inImg.at<uchar>(point.y, point.x + 1) == probHole)
+                        if((point.x + 1 < MAXW) && inImg.at<uchar>(point.y, point.x + 1) != spotted)
                             stack.push(Coordinate(point.x + 1, point.y));
                     }
                 }
             }
         }
     }
-    
-    std::cout << holes.size() << std::endl;
+
+    return holes;
 }
 
 /// Get sum of column / row
@@ -156,7 +161,7 @@ void DoubleThreshold(cv::Mat& inImg, cv::Mat& outImg)
         for (j = 0; j < nCols; ++j)
         {
             // Get freq min ->0 - 128 max -> 128 -255
-            if (inRow[j] > 100 && inRow[j] < 200)
+            if (inRow[j] > 80 && inRow[j] < 240)
                 outRow[j] = 0;
             else
                 outRow[j] = 255;

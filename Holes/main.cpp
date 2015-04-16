@@ -17,6 +17,8 @@ int main(int argc, char** argv)
     Mat prepImg = cv::Mat::zeros(inImg.size(), inImg.type());
     Mat binImg = cv::Mat::zeros(inImg.size(), inImg.type());
 
+    imwrite("gray.jpg", inImg);
+
     ///
     /// Create output filename
     std::string filename(argv[1]);
