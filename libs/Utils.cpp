@@ -87,7 +87,7 @@ int GetMean(cv::Mat inImg)
 
 }
 
-/// Standard deviation algorithm
+/// Mean algorithm
 template <class T>
 double Mean(std::vector<T> &v)
 {
