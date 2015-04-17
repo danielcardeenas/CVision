@@ -1,6 +1,4 @@
-# Ellipse detection
-Detects the circles of a given image using [This method](http://hci.iwr.uni-heidelberg.de/publications/dip/2002/ICPR2002/DATA/07_3_20.PDF).
-Some modifications to the method have been done in oder to make it work faster.
+# Holes detection
 
 ### Compiling
 
@@ -8,13 +6,13 @@ Clone this repository and build the project using [CMake](http://www.cmake.org/d
 
 ```sh
 $ git clone https://github.com/danielcardeenas/CVision.git
-$ cd CVision/Ellipses/
+$ cd CVision/Holes/
 $ cmake .
 $ make
 ```
 ### Run
 ```sh
-$ ./ellipse <img_to_use.jpg> <[int]threshold (optional)>
+$ ./holes <img_to_use>
 ```
 #####Outputs
 
