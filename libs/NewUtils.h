@@ -6,8 +6,13 @@
 #define ELLIPSES_NEWUTILS_H
 
 #include <opencv2/core/core.hpp>
+#include <stack>
+#include "Coordinate.h"
+#include "Shape.h"
 
 void DetectHoles(cv::Mat inImg, cv::Mat outImg);
 template <class T> int GetSum(T &v, int size);
+void DoubleThreshold(cv::Mat& inImg, cv::Mat& outImg);
+void DFSHist(cv::Mat& inImg, std::vector<int>& colsValues, std::vector<int>& rowsValues);
 
 #endif //ELLIPSES_NEWUTILS_H

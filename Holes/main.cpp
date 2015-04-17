@@ -36,10 +36,12 @@ int main(int argc, char** argv)
     /// Canny is way more fast than two sobel convolutions.
     /// TODO: Implement Canny detection.
     cv::blur(inImg, prepImg, cv::Size(5,5));
-    cv::Canny(prepImg, prepImg, 100, 150, 3);
-    MeanThreshold(prepImg, binImg);
+    //cv::Canny(prepImg, prepImg, 100, 150, 3);
+    DoubleThreshold(prepImg, binImg);
     //imshow("cannied", binImg);
     //waitKey(99999);
+    
+    imwrite("thresh.jpg", binImg);
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
