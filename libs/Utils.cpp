@@ -268,6 +268,18 @@ void FloodFill(cv::Mat& inImg, cv::Mat& outImg)
 }
 
 /// Easy-way calling method
+/// Detects damages on streets via DFS
+std::vector<Shape> DetectDamages(cv::Mat& inImg, cv::Mat& outImg)
+{
+    std::vector<Shape> shapes;
+    shapes = GetShapes(inImg);
+
+    //DrawShapes(outImg, shapes);
+    
+    return shapes;
+}
+
+/// Easy-way calling method
 /// Assumes the image has not been binarized so it will do all the proccess
 void DetectShapes(cv::Mat& inImg, cv::Mat& outImg)
 {

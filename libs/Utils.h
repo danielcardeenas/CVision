@@ -55,4 +55,10 @@ void DrawCircles(cv::Mat& outImg, circleStruct& circles);
 void DetectEllipses(cv::Mat &inImg, cv::Mat &outImg, int threshold = 0, int minMajorAxis = 120);
 int findMaximum(unsigned int* &a, int n);
 
+/* ==========================================================================
+     Test
+     --------------------------------------------------------------------------
+*/
+std::vector<Shape> DetectDamages(cv::Mat& inImg, cv::Mat& outImg);
+
 #endif // __UTILS_H_INCLUDED__
