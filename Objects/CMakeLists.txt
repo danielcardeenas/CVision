@@ -22,6 +22,8 @@ set(LIB_FILES
     ../libs/Coordinate.h
     ../libs/Shape.cpp
     ../libs/Shape.h
+    ../libs/Ellipse.cpp
+    ../libs/Ellipse.h
     )
     
 add_executable(objects ${SOURCE_FILES} ${LIB_FILES})
