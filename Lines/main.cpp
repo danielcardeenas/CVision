@@ -57,5 +57,5 @@ int main(int argc, char** argv)
 
     std::chrono::steady_clock::time_point end= std::chrono::steady_clock::now();
     std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " Miliseconds" <<std::endl;
-    imwrite("chess_100.jpg", colorImg);
+    imwrite("output.jpg", colorImg);
 }
