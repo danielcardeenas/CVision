@@ -6,7 +6,7 @@ Dependencies of these tools:
 + **CMake**
 + **GCC / Clang**
 
-##Class
+## Class
 The class assignments will be in the root of the repo categrized by subdirectories
 
 1.  [Borders detection](https://github.com/danielcardeenas/CVision/tree/master/Borders). The **Borders/** folder
@@ -16,5 +16,5 @@ The class assignments will be in the root of the repo categrized by subdirectori
 5.  [Ellipses detection](https://github.com/danielcardeenas/CVision/tree/master/Ellipses). The **Ellipses/** folder
 6.  [Holes detection](https://github.com/danielcardeenas/CVision/tree/master/Holes). The **Holes/** folder
 
-##Test
+## Test
 1.  [Damaged streets detection](https://github.com/danielcardeenas/CVision/tree/master/Streets). The **Streets/** folder
