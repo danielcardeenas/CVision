@@ -16,7 +16,7 @@ $ make
 ```sh
 $ ./ellipse <img_to_use.jpg> <[int]threshold (optional)>
 ```
-#####Outputs
+##### Outputs
 
 ```sh
 > Centers:
@@ -44,12 +44,12 @@ Sorry for the one big function code. I will refactor this, altough, a good expla
 ### Samples
 
 
-######NOTE:
+###### NOTE:
 The algorithm runs VERY slow (therefore the images used in the examples are small and simple) but the accumulator ended up being just one-dimensioned.
 
 Anyways, the method seems to lack on precision so I will implement the normal Hough Transform on this to get better results even if it's slow.
 
-#####Threshold: auto
+##### Threshold: auto
 
 **Input**: ```img/ellipse.png```
 **Outputs**: ```ellipsemin.png```
@@ -57,7 +57,7 @@ Anyways, the method seems to lack on precision so I will implement the normal Ho
 <img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Ellipses/img/ellipse.png" width="320" height="240" />
 <img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Ellipses/ellipsemin.png" width="320" height="240" />
 
-#####Threshold: auto
+##### Threshold: auto
 
 **Input**: ```img/fig2.jpg```
 **Outputs**: ```ellipsefig2.jpg```
