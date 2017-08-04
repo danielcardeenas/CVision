@@ -15,7 +15,7 @@ $ make
 ```sh
 $ ./lines <img_to_use.jpg>
 ```
-#####Outputs
+##### Outputs
 
 ```sh
 > lines: 25 100
@@ -39,7 +39,7 @@ $ ./lines <img_to_use.jpg>
 
 ---------------------------------------
 
-######NOTE:
+###### NOTE:
 Currently uses **opencv** library functinos for pre-processing:
 + Blur (remove noise).
 + Canny (border detection).
@@ -53,7 +53,7 @@ Altough my own pre-processing funcitons produce almost exactly the same output, 
 3.  After that [`DrawLines()`](https://github.com/danielcardeenas/CVision/blob/master/libs/Utils.cpp#L615) just draw the lines computed from `GetLines()` in the original image.
 
 ### Samples
-#####Threshold: 100 votes
+##### Threshold: 100 votes
 
 **Input**: ```img/chessboard1.png```
 **Outputs**: ```chess_100.jpg```
@@ -61,7 +61,7 @@ Altough my own pre-processing funcitons produce almost exactly the same output, 
 <img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Lines/img/chessboard1.png" width="320" height="240" />
 <img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Lines/chess_100.jpg" width="320" height="240" />
 
-#####Threshold: 200 votes
+##### Threshold: 200 votes
 
 **Input**: ```img/chessboard1.png```
 **Outputs**: ```chess_200.jpg```
