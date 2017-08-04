@@ -15,7 +15,7 @@ $ make
 ```sh
 $ ./circles <img_to_use.jpg> <[int]threshold (optional)>
 ```
-#####Outputs
+##### Outputs
 
 ```sh
 > Centers:
@@ -48,7 +48,7 @@ The function can work without giving any parameters at all, the program can choo
 
 ### Samples
 
-#####Threshold: 135
+##### Threshold: 135
 
 **Input**: ```img/fig.png```
 **Outputs**: ```figCircles135.jpg```
@@ -56,7 +56,7 @@ The function can work without giving any parameters at all, the program can choo
 <img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Circles/img/fig.png" width="320" height="240" />
 <img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Circles/figCircles135.jpg" width="320" height="240" />
 
-#####Threshold: 90
+##### Threshold: 90
 
 **Input**: ```img/billar2.jpg```
 **Outputs**: ```billar90.jpg```
@@ -72,7 +72,7 @@ The function can work without giving any parameters at all, the program can choo
 <img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Circles/img/pool6.jpg" width="320" height="240" />
 <img src="https://raw.githubusercontent.com/danielcardeenas/CVision/master/Circles/poolAuto.jpg" width="320" height="240" />
 
-#####Threshold: Auto
+##### Threshold: Auto
 
 **Input**: ```img/mike.jpg```
 **Outputs**: ```mikeAuto.jpg```
